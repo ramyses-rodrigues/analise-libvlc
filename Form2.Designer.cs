@@ -82,6 +82,7 @@
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.progressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
@@ -229,20 +230,20 @@
             // 
             this.desfazerToolStripMenuItem.Name = "desfazerToolStripMenuItem";
             this.desfazerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.desfazerToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.desfazerToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.desfazerToolStripMenuItem.Text = "&Desfazer";
             // 
             // refazerToolStripMenuItem
             // 
             this.refazerToolStripMenuItem.Name = "refazerToolStripMenuItem";
             this.refazerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.refazerToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.refazerToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.refazerToolStripMenuItem.Text = "&Refazer";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(221, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(198, 6);
             // 
             // recortarToolStripMenuItem
             // 
@@ -250,7 +251,7 @@
             this.recortarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.recortarToolStripMenuItem.Name = "recortarToolStripMenuItem";
             this.recortarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.recortarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.recortarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.recortarToolStripMenuItem.Text = "Recor&tar";
             this.recortarToolStripMenuItem.Click += new System.EventHandler(this.recortarToolStripMenuItem_Click);
             // 
@@ -260,7 +261,7 @@
             this.copiarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.copiarToolStripMenuItem.Name = "copiarToolStripMenuItem";
             this.copiarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.copiarToolStripMenuItem.Text = "&Copiar";
             this.copiarToolStripMenuItem.Click += new System.EventHandler(this.copiarToolStripMenuItem_Click);
             // 
@@ -270,19 +271,19 @@
             this.colarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.colarToolStripMenuItem.Name = "colarToolStripMenuItem";
             this.colarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.colarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.colarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.colarToolStripMenuItem.Text = "&Colar";
             this.colarToolStripMenuItem.Click += new System.EventHandler(this.colarToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(221, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(198, 6);
             // 
             // selecionarTudoToolStripMenuItem
             // 
             this.selecionarTudoToolStripMenuItem.Name = "selecionarTudoToolStripMenuItem";
-            this.selecionarTudoToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.selecionarTudoToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.selecionarTudoToolStripMenuItem.Text = "Selecionar &Tudo";
             // 
             // ferramentasToolStripMenuItem
@@ -374,7 +375,8 @@
             this.toolStripSeparator8,
             this.tsPlaylist,
             this.toolStripComboBox1,
-            this.tsRate});
+            this.tsRate,
+            this.progressBar1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(800, 42);
@@ -522,6 +524,14 @@
             this.toolStripMenuItem4.Size = new System.Drawing.Size(118, 26);
             this.toolStripMenuItem4.Text = "2.0x";
             // 
+            // progressBar1
+            // 
+            this.progressBar1.AutoSize = false;
+            this.progressBar1.AutoToolTip = true;
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(100, 15);
+            this.progressBar1.ToolTipText = "Progresso do registro";
+            // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
@@ -621,5 +631,6 @@
         private System.Windows.Forms.ToolStripDropDownButton tsPlaylist;
         private System.Windows.Forms.ToolStripMenuItem informaçõesDaMídiaToolStripMenuItem;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.ToolStripProgressBar progressBar1;
     }
 }

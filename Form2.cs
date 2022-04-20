@@ -400,6 +400,9 @@ namespace analise_libvlc
             TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < length ? ctime : 0);
             TimeSpan tsTotal = TimeSpan.FromMilliseconds(length > 0 ? length : 0);
 
+            // atualiza progressbar
+            progressBar1.Value = pos >= 0 & pos <= 1 ? (int)(pos * 100) : 0;
+
             // atualiza caption
             this.Text = _state.ToString() + " @rate " + _rate.ToString() +
                         " - " + ts.ToString(@"hh\:mm\:ss") +
