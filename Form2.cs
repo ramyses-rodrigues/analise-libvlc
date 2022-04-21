@@ -29,7 +29,17 @@ namespace analise_libvlc
             }
 
             InitializeComponent();
-            _libVLC = new LibVLC();
+
+            try
+            {
+                _libVLC = new LibVLC();
+            }
+            catch (Exception ex)
+            { 
+                MessageBox.Show(ex.Message);
+                Application.Exit();
+            }
+
             _mp = new MediaPlayer(_libVLC);
 
             // Create a timer with a two second interval.

@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <Title>LibVLCSharp.WinForms.Sample</Title>
-    <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net6.0-windows</TargetFrameworks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <RootNamespace></RootNamespace>
-    <StartupObject>analise_libvlc.Program</StartupObject>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.16" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="LibVLCSharp">
-      <HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp\bin\Win32Debug\net6.0-windows\LibVLCSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="LibVLCSharp.WinForms">
-      <HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp.WinForms\bin\Win32Debug\netcoreapp3.1\LibVLCSharp.WinForms.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<PropertyGroup>
+		<Title>analise-libvlc</Title>
+		<OutputType>WinExe</OutputType>
+		<TargetFrameworks>net6.0-windows</TargetFrameworks>
+		<UseWindowsForms>true</UseWindowsForms>
+		<RootNamespace></RootNamespace>
+		<StartupObject>analise_libvlc.Program</StartupObject>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.16" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="LibVLCSharp">
+			<HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp\bin\Win32Debug\net6.0-windows\LibVLCSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="LibVLCSharp.WinForms">
+			<HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp.WinForms\bin\Win32Debug\netcoreapp3.1\LibVLCSharp.WinForms.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 </Project>
