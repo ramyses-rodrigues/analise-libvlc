@@ -130,9 +130,20 @@ namespace analise_libvlc
 
         public void insertMediaTimetoText()
         {
+            if (_mp == null) return;
+            if (_mp.Media == null) return;
+
             int index = richTextBox1.SelectionStart;
             int line = richTextBox1.GetLineFromCharIndex(index);
-            MessageBox.Show("cursor at line " + line.ToString() + ": " + richTextBox1.Lines[line]);
+                        
+            var ctime = _mp.Time; // posição da stream em milisegundos
+            // converte para formato de hh:min:seg
+            TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < _mp.Length ? ctime : 0);
+
+            string strText = "Posição " + ts.ToString(@"hh\:mm\:ss") + " - (" + 
+                                  (_mp.Time >= 0? _mp.Time.ToString():"0") + ")\r\n";
+            richTextBox1.AppendText(strText); // insere texto na posição do cursor
+          
         }
 
         public void GetMediaTimefromText()
@@ -370,12 +381,12 @@ namespace analise_libvlc
                     }
                 case Keys.F7: // inserir tempo no texto
                     {
-                        GetMediaTimefromText();
+                        insertMediaTimetoText();
                         break;
                     }
                 case Keys.F8: // ir para tempo a partir do texto
                     {
-                        insertMediaTimetoText();
+                        GetMediaTimefromText();
                         break;
                     }
                 case Keys.F12: // salvar texto
