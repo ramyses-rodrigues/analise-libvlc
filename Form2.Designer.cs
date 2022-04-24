@@ -528,7 +528,6 @@
             // progressBar1
             // 
             this.progressBar1.AutoSize = false;
-            this.progressBar1.AutoToolTip = true;
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(200, 15);
             this.progressBar1.ToolTipText = "Progresso do registro";

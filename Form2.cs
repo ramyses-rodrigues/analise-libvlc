@@ -458,6 +458,7 @@ namespace analise_libvlc
             // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
             float relativeMouse = absoluteMouse / calcFactor;
 
+            //(sender as ToolStripProgressBar).ToolTip().
             // Set the calculated relative value to the progressbar //
             //progressBar1.Value = Convert.ToInt32(relativeMouse);
             this.Text = "Ir para posição: " + relativeMouse.ToString();
