@@ -86,6 +86,7 @@
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -529,8 +530,10 @@
             this.progressBar1.AutoSize = false;
             this.progressBar1.AutoToolTip = true;
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(100, 15);
+            this.progressBar1.Size = new System.Drawing.Size(200, 15);
             this.progressBar1.ToolTipText = "Progresso do registro";
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
+            this.progressBar1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.progressBar1_MouseMove);
             // 
             // toolStripMenuItem5
             // 
@@ -632,5 +635,6 @@
         private System.Windows.Forms.ToolStripMenuItem informaçõesDaMídiaToolStripMenuItem;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.ToolStripProgressBar progressBar1;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

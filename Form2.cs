@@ -35,7 +35,7 @@ namespace analise_libvlc
                 _libVLC = new LibVLC();
             }
             catch (Exception ex)
-            { 
+            {
                 MessageBox.Show(ex.Message);
                 Application.Exit();
             }
@@ -105,7 +105,7 @@ namespace analise_libvlc
         }
 
         private void openMediaFile(String filePath)
-        {            
+        {
             if ((filePath == null) || (filePath == String.Empty)) return;
             try
             {
@@ -145,15 +145,15 @@ namespace analise_libvlc
 
             int index = richTextBox1.SelectionStart;
             int line = richTextBox1.GetLineFromCharIndex(index);
-                        
+
             var ctime = _mp.Time; // posição da stream em milisegundos
             // converte para formato de hh:min:seg
             TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < _mp.Length ? ctime : 0);
 
-            string strText = "Posição " + ts.ToString(@"hh\:mm\:ss") + " - (" + 
-                                  (_mp.Time >= 0? _mp.Time.ToString():"0") + ")\r\n";
+            string strText = "Posição " + ts.ToString(@"hh\:mm\:ss") + " - (" +
+                                  (_mp.Time >= 0 ? _mp.Time.ToString() : "0") + ")\r\n";
             richTextBox1.AppendText(strText); // insere texto na posição do cursor
-          
+
         }
 
         public void GetMediaTimefromText()
@@ -430,9 +430,42 @@ namespace analise_libvlc
                         " / " + tsTotal.ToString(@"hh\:mm\:ss");
         }
 
-        #endregion
+        private void progressBar1_Click(object sender, EventArgs e)
+        {
+            if (_mp == null) return;
+            if (_mp.Media == null) return;
+            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
+            float absoluteMouse = (PointToClient(MousePosition).X - progressBar1.Bounds.X);
+            // Calculate the factor for converting the position (progbarWidth/100) //
+            float calcFactor = progressBar1.Width / (float)progressBar1.Maximum;
+            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
+            float relativeMouse = absoluteMouse / calcFactor;
 
+            // Set the calculated relative value to the progressbar //
+            //progressBar1.Value = Convert.ToInt32(relativeMouse);
+           
+            _mp.Position = (float)relativeMouse / 100;
+        }        
+
+        private void progressBar1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_mp == null) return;
+            if (_mp.Media == null) return;
+            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
+            float absoluteMouse = (PointToClient(MousePosition).X - progressBar1.Bounds.X);
+            // Calculate the factor for converting the position (progbarWidth/100) //
+            float calcFactor = progressBar1.Width / (float)progressBar1.Maximum;
+            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
+            float relativeMouse = absoluteMouse / calcFactor;
+
+            // Set the calculated relative value to the progressbar //
+            //progressBar1.Value = Convert.ToInt32(relativeMouse);
+            this.Text = "Ir para posição: " + relativeMouse.ToString();
+            //_mp.Position = (float)relativeMouse / 100;
+        }
         
+        
+        #endregion
     }
 
 }

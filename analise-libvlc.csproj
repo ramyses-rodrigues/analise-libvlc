@@ -7,6 +7,7 @@
 		<RootNamespace></RootNamespace>
 		<StartupObject>analise_libvlc.Program</StartupObject>
 		<PublishSingleFile>true</PublishSingleFile>
+		<Description>Análise de conteúdo com dotNET</Description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.16" />
