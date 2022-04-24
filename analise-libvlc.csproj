@@ -7,6 +7,9 @@
 		<RootNamespace></RootNamespace>
 		<StartupObject>analise_libvlc.Program</StartupObject>
 	</PropertyGroup>
+	<PropertyGroup>
+		<PublishSingleFile>true</PublishSingleFile>
+	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.16" />
 	</ItemGroup>
