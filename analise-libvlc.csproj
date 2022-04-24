@@ -6,8 +6,6 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<RootNamespace></RootNamespace>
 		<StartupObject>analise_libvlc.Program</StartupObject>
-	</PropertyGroup>
-	<PropertyGroup>
 		<PublishSingleFile>true</PublishSingleFile>
 	</PropertyGroup>
 	<ItemGroup>
