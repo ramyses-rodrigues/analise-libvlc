@@ -423,6 +423,7 @@ namespace analise_libvlc
 
             // atualiza progressbar
             progressBar1.Value = pos >= 0 & pos <= 1 ? (int)(pos * 100) : 0;
+            progressBar2.Value = pos >= 0 & pos <= 1 ? (int)(pos * 100) : 0;
 
             // atualiza caption
             this.Text = _state.ToString() + " @rate " + _rate.ToString() +
@@ -435,9 +436,9 @@ namespace analise_libvlc
             if (_mp == null) return;
             if (_mp.Media == null) return;
             // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
-            float absoluteMouse = (PointToClient(MousePosition).X - progressBar1.Bounds.X);
+            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
             // Calculate the factor for converting the position (progbarWidth/100) //
-            float calcFactor = progressBar1.Width / (float)progressBar1.Maximum;
+            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
             // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
             float relativeMouse = absoluteMouse / calcFactor;
 
@@ -452,16 +453,17 @@ namespace analise_libvlc
             if (_mp == null) return;
             if (_mp.Media == null) return;
             // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
-            float absoluteMouse = (PointToClient(MousePosition).X - progressBar1.Bounds.X);
+            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
             // Calculate the factor for converting the position (progbarWidth/100) //
-            float calcFactor = progressBar1.Width / (float)progressBar1.Maximum;
+            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
             // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
             float relativeMouse = absoluteMouse / calcFactor;
 
             //(sender as ToolStripProgressBar).ToolTip().
             // Set the calculated relative value to the progressbar //
             //progressBar1.Value = Convert.ToInt32(relativeMouse);
-            this.Text = "Ir para posição: " + relativeMouse.ToString();
+            
+            statusLabel1.Text = "Ir para posição: " + relativeMouse.ToString("N");
             //_mp.Position = (float)relativeMouse / 100;
         }
         
