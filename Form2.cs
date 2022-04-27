@@ -40,18 +40,22 @@ namespace analise_libvlc
                 Application.Exit();
             }
 
+            // cria objeto Media Player e configura manipuladores de eventos
             _mp = new MediaPlayer(_libVLC);
+            _mp.EndReached += new EventHandler<EventArgs>(On_EndReached);
+            _mp.Stopped += new EventHandler<EventArgs>(On_Stopped);
+            _mp.TimeChanged += new EventHandler<MediaPlayerTimeChangedEventArgs>(On_MediaPlayerTimerChanged);
 
-            // Create a timer with a two second interval.
+            // cria um timer.
             _aTimer = new Timer();
-            // Hook up the Elapsed event for the timer. 
             _aTimer.Tick += new EventHandler(On_timer_Tick);
             _aTimer.Interval = 300;
             _aTimer.Enabled = true;
 
             //videoView1.MediaPlayer = _mp;
+            // configura form
             KeyPreview = true;
-            Load += On_FormLoad;
+            Load += new EventHandler(On_FormLoad);
             FormClosed += new FormClosedEventHandler(On_FormClosed);
             KeyDown += new KeyEventHandler(On_FormKeyDown);
 
@@ -82,6 +86,7 @@ namespace analise_libvlc
             richTextBox1.Font = new Font(richTextBox1.Font.FontFamily, 12);
         }
 
+        #region Funções utilitárias
         public static string ShowDialog(string text, string caption)
         {
             Form prompt = new Form()
@@ -104,24 +109,6 @@ namespace analise_libvlc
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
         }
 
-        private void openMediaFile(String filePath)
-        {
-            if ((filePath == null) || (filePath == String.Empty)) return;
-            try
-            {
-                var media = new Media(_libVLC, new Uri(filePath));
-                _mp.Play(media);
-                media.Dispose();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-            // atualiza playlist            
-            atualizaPlaylist();
-        }
-
         private void save2TXT()
         {
             SaveFileDialog dlg = new SaveFileDialog();
@@ -140,8 +127,7 @@ namespace analise_libvlc
 
         public void insertMediaTimetoText()
         {
-            if (_mp == null) return;
-            if (_mp.Media == null) return;
+            if (mediaPlayerNotOK()) return;
 
             int index = richTextBox1.SelectionStart;
             int line = richTextBox1.GetLineFromCharIndex(index);
@@ -217,15 +203,24 @@ namespace analise_libvlc
             }
         }
 
-        private void openMediaURL()
+        private void openMediaFile(String filePath)
         {
-            var filePath = ShowDialog("Entre com a URL", "URL: ");
-            if (filePath != string.Empty)
+            if ((filePath == null) || (filePath == String.Empty)) return;
+            try
             {
                 var media = new Media(_libVLC, new Uri(filePath));
-                _mp.Play(media);
+
+                if (!_mp.Play(media))
+                    MessageBox.Show("erro na reprodução!");
                 media.Dispose();
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            // atualiza playlist            
+            atualizaPlaylist();
         }
 
         private void getMediaInfo(Media media)
@@ -240,7 +235,7 @@ namespace analise_libvlc
                     (char)(fourCC >> 24 & 0xff));
             }
 
-            if (media == null) return;
+            if (mediaPlayerNotOK()) return;
 
             String songMetadata = "Informações da mídia atual: \r\n";
             songMetadata += "URL: " + new Uri(media.Mrl) + "\r\n\r\n";
@@ -261,8 +256,8 @@ namespace analise_libvlc
                     songMetadata += "Orientação: " + track.Data.Video.Orientation.ToString() + "\r\n";
                     songMetadata += "Frame: " + track.Data.Video.Height.ToString() + " x " +
                                                 track.Data.Video.Width.ToString() + "\r\n";
-                    songMetadata += "Frame Rate N: " + track.Data.Video.FrameRateNum.ToString() + "\r\n";
-                    songMetadata += "Frame Rate D: " + track.Data.Video.FrameRateDen.ToString() + "\r\n";
+                    songMetadata += "Frame Rate: " + ((float)track.Data.Video.FrameRateNum /
+                                                            track.Data.Video.FrameRateDen).ToString("F2") + " fps \r\n";
                 }
 
                 songMetadata += "Bitrate: " + track.Bitrate.ToString() + "\r\n";
@@ -274,6 +269,53 @@ namespace analise_libvlc
             MessageBox.Show(songMetadata);
         }
 
+        private void GetPicture()
+        {
+            //const char *image_path="/home/vinay/Documents/snap.png";
+            //int result = libvlc_video_take_snapshot(mp, 0, image_path, 0, 0);
+            // parece que "file:" está atrapalhando...                       
+
+            //obtém dimensões informações sobre o frame
+            var vtrackidx = _mp.VideoTrack; // obtém índice da stream do fluxo de vídeo
+            if (vtrackidx < 0) return;
+
+            var info = _mp.Media.Tracks;
+            long time = _mp.Time;
+
+            uint w = _mp.Media.Tracks[vtrackidx].Data.Video.Width;
+            uint h = _mp.Media.Tracks[vtrackidx].Data.Video.Height;
+
+            String _path = _mp.Media.Mrl;
+            _path = _path.Replace("file:///", ""); // retira o termo "file:///" que vem na string Mrl...
+                                                   //_path = _path.Substring(8); 
+            String image_path = Path.GetDirectoryName(_path) + "\\" + // constroi nome único
+                                Path.GetFileNameWithoutExtension(_path) +
+                                "-" + time.ToString() + ".png";
+
+            // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
+            if (_mp.TakeSnapshot(0, image_path, w, h))
+                MessageBox.Show("Arquivo " + Path.GetFileNameWithoutExtension(_path)
+                    + " salvo com sucesso na pasta " + Path.GetDirectoryName(_path));
+        }
+
+        private int progressBarRelativeMouseClick(object sender, EventArgs e)
+        {            
+            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
+            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
+            // Calculate the factor for converting the position (progbarWidth/100) //
+            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
+            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
+            float relativeMouse = absoluteMouse / calcFactor;
+
+            return Convert.ToInt32(relativeMouse);
+        }
+
+        private bool mediaPlayerNotOK()
+        {
+            return ((_mp == null) || (_mp.Media == null));
+        }
+
+        #endregion
 
         #region handlers menu e toolbar
         private void abrirToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -299,7 +341,11 @@ namespace analise_libvlc
 
         private void abrirURLToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            openMediaURL();
+            var filePath = ShowDialog("Entre com a URL", "URL: ");
+            if (filePath != string.Empty)
+            {
+                openMediaFile(filePath);
+            }
         }
 
         private void informaçõesDaMídiaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -329,7 +375,107 @@ namespace analise_libvlc
 
         #endregion
 
-        #region eventos de controles de formulário e timer
+        #region manipuladores de eventos de componentes, controles de formulário e timer
+        private void On_EndReached(object sender, EventArgs e)
+        {
+            // verifica a mídia em reprodução atual para inserir marcação no item, se for o caso
+            //var sfile = new Uri(_mp.Media.Mrl); // transforma no formato uri para ser possível comparar
+            //MessageBox.Show("Final da stream: " + sfile.ToString());
+            //_mp.Stop();
+            //openMediaFile(sfile.ToString());
+            //var aUri = new Uri(tsPlaylist.DropDownItems[idx].Text);
+            //if (aUri == list) ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
+            //_mp.Media = _mp.Media;
+            //_mp.Stop();
+        }
+
+        private void On_Stopped(object sender, EventArgs e)
+        {
+            // atualiza caption
+            //this.Text = _mp.State.ToString() + " @rate " + _mp.Rate.ToString();
+
+            //// verifica a mídia em reprodução atual para inserir marcação no item, se for o caso
+            //var sfile = new Uri(_mp.Media.Mrl); // transforma no formato uri para ser possível comparar
+            //MessageBox.Show("Parou a reprodução do item: " + sfile.ToString());
+            ////_mp.Stop();
+            ////openMediaFile(sfile.ToString());
+            ////var aUri = new Uri(tsPlaylist.DropDownItems[idx].Text);
+            ////if (aUri == list) ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
+            ////_mp.Media = _mp.Media;
+            ////_mp.Stop();
+        }
+
+        private void On_timer_Tick(object sender, EventArgs e)
+        {
+            if (mediaPlayerNotOK()) return;
+
+            //return;
+            //if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing) || (_mp.State == VLCState.Stopped))
+            //{
+            var pos = _mp.Position; // obtém a posição da stream em percentual
+            var length = _mp.Length; // tamanho total da string em milisegundos 
+            var ctime = _mp.Time; // posição da stream em milisegundos
+            var _state = _mp.State;
+            var _rate = _mp.Rate;
+
+            // converte para formato de hh:min:seg
+            TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < length ? ctime : 0);
+            TimeSpan tsTotal = TimeSpan.FromMilliseconds(length > 0 ? length : 0);
+
+            // atualiza progressbar
+            int val = Convert.ToInt32(pos * 100);
+            val = val >= 0 & val <= 100 ? val : 0;
+            progressBar1.Value = val;
+
+            // atualiza caption
+            this.Text = _state.ToString() + " @rate " + _rate.ToString() +
+                        " - " + ts.ToString(@"hh\:mm\:ss") +
+                        " / " + tsTotal.ToString(@"hh\:mm\:ss");
+            //}
+        }
+
+        public delegate void OnMediaPlayerTimerChangedDelegate(String txt, int v);
+        private void On_MediaPlayerTimerChanged(object sender, MediaPlayerTimeChangedEventArgs e)
+        {
+            void SetFormCaption(String capt, int val)
+            {
+                Text = capt;
+                progressBar1.Value = val;
+            }
+
+            // intervalo???
+            return;
+            //if (mediaPlayerNotOK()) return;
+            //if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing) || (_mp.State == VLCState.Stopped))
+            //{
+            var pos = _mp.Position; // obtém a posição da stream em percentual
+            var length = _mp.Length; // tamanho total da string em milisegundos 
+            var ctime = e.Time; // posição da stream em milisegundos
+            var _state = _mp.State;
+            var _rate = _mp.Rate;
+
+            // converte para formato de hh:min:seg
+            TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < length ? ctime : 0);
+            TimeSpan tsTotal = TimeSpan.FromMilliseconds(length > 0 ? length : 0);
+
+            // atualiza progressbar
+            int val = Convert.ToInt32(pos * 100);
+            val = val >= 0 & val <= 100 ? val : 0;
+
+            String text = _state.ToString() + " @rate " + _rate.ToString() +
+                        " - " + ts.ToString(@"hh\:mm\:ss") +
+                        " / " + tsTotal.ToString(@"hh\:mm\:ss");
+
+            if (InvokeRequired)
+            {
+                OnMediaPlayerTimerChangedDelegate callback = SetFormCaption;
+                Invoke(callback, text, val);
+            }
+
+            //statusLabel1.Text = TimeSpan.FromMilliseconds(e.Time).ToString().Substring(0, 8);
+            //}
+        }
+
         private void On_FormClosed(object sender, FormClosedEventArgs e)
         {
             _aTimer.Stop();
@@ -344,13 +490,20 @@ namespace analise_libvlc
             //_mp.Play(media);
             //media.Dispose();
 
-            //openMediaFile();
+            openMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
         }
 
         private void On_FormKeyDown(object sender, KeyEventArgs e)
         {
+            if (mediaPlayerNotOK()) return;
+
             switch (e.KeyCode)
             {
+                case Keys.Escape: // pausa simples
+                    {
+                        _mp.Stop();
+                        break;
+                    }
                 case Keys.Space: // pausa simples
                     {
                         if (!richTextBox1.Focused)
@@ -375,6 +528,12 @@ namespace analise_libvlc
                     }
                 case Keys.F1: // pausa/play com retorno
                     {
+                        if (_mp.State == VLCState.Stopped)
+                        {
+                            _mp.Play(); // reproduz do início
+                            break;
+                        }
+
                         if (_mp.IsPlaying)
                             _mp.SetPause(true);
                         else
@@ -387,6 +546,11 @@ namespace analise_libvlc
                 case Keys.F2: // pausa/play simples
                     {
                         _mp.SetPause(_mp.IsPlaying);
+                        break;
+                    }
+                case Keys.F6: // take a snapshot
+                    {
+                        GetPicture();
                         break;
                     }
                 case Keys.F7: // inserir tempo no texto
@@ -404,71 +568,71 @@ namespace analise_libvlc
                         save2TXT();
                         break;
                     }
+                case Keys.PageDown: // retorna xx milisegundos (to do: implementar avançar frame a frame!)
+                    {
+                        if (richTextBox1.Focused)
+                            e.SuppressKeyPress = true;
+                        if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
+                            _mp.Time -= 3000;
+                        break;
+                    }
+                case Keys.PageUp: // avança xx milisegundos
+                    {
+                        if (richTextBox1.Focused)
+                            e.SuppressKeyPress = true;
+                        if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
+                        {
+                            var len = _mp.Length;
+                            var time = _mp.Time;
+                            _mp.Time += time + 3000 > len ? len - time : 3000;
+                        }
+                        break;
+                    }
             }
-        }
-
-        private void On_timer_Tick(object sender, EventArgs e)
-        {
-            if (_mp == null) return;
-
-            var pos = _mp.Position; // obtém a posição da stream em percentual
-            var length = _mp.Length; // tamanho total da string em milisegundos 
-            var ctime = _mp.Time; // posição da stream em milisegundos
-            var _state = _mp.State;
-            var _rate = _mp.Rate;
-
-            // converte para formato de hh:min:seg
-            TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < length ? ctime : 0);
-            TimeSpan tsTotal = TimeSpan.FromMilliseconds(length > 0 ? length : 0);
-
-            // atualiza progressbar
-            progressBar1.Value = pos >= 0 & pos <= 1 ? (int)(pos * 100) : 0;
-            progressBar2.Value = pos >= 0 & pos <= 1 ? (int)(pos * 100) : 0;
-
-            // atualiza caption
-            this.Text = _state.ToString() + " @rate " + _rate.ToString() +
-                        " - " + ts.ToString(@"hh\:mm\:ss") +
-                        " / " + tsTotal.ToString(@"hh\:mm\:ss");
         }
 
         private void progressBar1_Click(object sender, EventArgs e)
         {
-            if (_mp == null) return;
-            if (_mp.Media == null) return;
-            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
-            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
-            // Calculate the factor for converting the position (progbarWidth/100) //
-            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
-            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
-            float relativeMouse = absoluteMouse / calcFactor;
+            if (mediaPlayerNotOK()) return;
 
-            // Set the calculated relative value to the progressbar //
-            //progressBar1.Value = Convert.ToInt32(relativeMouse);
-           
-            _mp.Position = (float)relativeMouse / 100;
-        }        
+            int pos = progressBarRelativeMouseClick(sender, e); // retorna um inteiro [0:100] com a posição do clique
+            if (pos >= 0)
+                _mp.Position = (float)pos / 100;
+        }
 
         private void progressBar1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_mp == null) return;
-            if (_mp.Media == null) return;
-            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
-            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
-            // Calculate the factor for converting the position (progbarWidth/100) //
-            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
-            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
-            float relativeMouse = absoluteMouse / calcFactor;
-
-            //(sender as ToolStripProgressBar).ToolTip().
-            // Set the calculated relative value to the progressbar //
-            //progressBar1.Value = Convert.ToInt32(relativeMouse);
-            
-            statusLabel1.Text = "Ir para posição: " + relativeMouse.ToString("N");
-            //_mp.Position = (float)relativeMouse / 100;
+            char pad = '0';
+            int pos = progressBarRelativeMouseClick(sender, e);
+            if (pos >= 0)
+                statusLabel1.Text = "Ir para posição: " + pos.ToString().PadLeft(3, pad);
         }
-        
-        
+
+        private void carregarTextoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (mediaPlayerNotOK()) return;
+
+            var filePath = String.Empty;
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Multiselect = false;
+                openFileDialog.Filter = "All files (*.rtf)|*.rtf";
+                openFileDialog.InitialDirectory = Path.GetDirectoryName(_mp.Media.Mrl);
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {                    
+                    filePath = openFileDialog.FileName; 
+                    if (File.Exists(filePath))
+                        richTextBox1.LoadFile(filePath);
+                }
+            }            
+        }
+
+
+
         #endregion
+
     }
 
 }
