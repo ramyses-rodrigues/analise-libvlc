@@ -223,6 +223,38 @@ namespace analise_libvlc
             atualizaPlaylist();
         }
 
+        private void PlayPause()
+        {
+            if (_mp.State == VLCState.Stopped)
+            {
+                _mp.Play(); // reproduz do início
+                return;
+            }
+
+            _mp.SetPause(_mp.IsPlaying);
+        }
+
+        private void Stop()
+        {
+            _mp.Stop();
+        }
+
+        private void Backward() // pagedown
+        {            
+            if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
+                _mp.Time -= 3000;
+        }
+
+        private void Forward() // pageup
+        {
+            if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
+            {
+                var len = _mp.Length;
+                var time = _mp.Time;
+                _mp.Time += time + 3000 > len ? len - time : 3000;
+            }
+        }
+
         private void getMediaInfo(Media media)
         {
             string FromFourCC(UInt32 fourCC)
@@ -299,7 +331,7 @@ namespace analise_libvlc
         }
 
         private int progressBarRelativeMouseClick(object sender, EventArgs e)
-        {            
+        {
             // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
             float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
             // Calculate the factor for converting the position (progbarWidth/100) //
@@ -501,7 +533,7 @@ namespace analise_libvlc
             {
                 case Keys.Escape: // pausa simples
                     {
-                        _mp.Stop();
+                        Stop();                        
                         break;
                     }
                 case Keys.Space: // pausa simples
@@ -545,7 +577,7 @@ namespace analise_libvlc
                     }
                 case Keys.F2: // pausa/play simples
                     {
-                        _mp.SetPause(_mp.IsPlaying);
+                        PlayPause();
                         break;
                     }
                 case Keys.F6: // take a snapshot
@@ -572,20 +604,14 @@ namespace analise_libvlc
                     {
                         if (richTextBox1.Focused)
                             e.SuppressKeyPress = true;
-                        if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
-                            _mp.Time -= 3000;
+                        Backward();                        
                         break;
                     }
                 case Keys.PageUp: // avança xx milisegundos
-                    {
+                    {                        
                         if (richTextBox1.Focused)
                             e.SuppressKeyPress = true;
-                        if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
-                        {
-                            var len = _mp.Length;
-                            var time = _mp.Time;
-                            _mp.Time += time + 3000 > len ? len - time : 3000;
-                        }
+                        Forward();
                         break;
                     }
             }
@@ -621,12 +647,12 @@ namespace analise_libvlc
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {                    
-                    filePath = openFileDialog.FileName; 
+                {
+                    filePath = openFileDialog.FileName;
                     if (File.Exists(filePath))
                         richTextBox1.LoadFile(filePath);
                 }
-            }            
+            }
         }
 
 
