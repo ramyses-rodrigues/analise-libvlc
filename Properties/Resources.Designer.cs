@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace .Properties {
+namespace analise_libvlc.Properties {
     using System;
     
     

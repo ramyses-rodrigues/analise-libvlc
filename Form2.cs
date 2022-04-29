@@ -21,6 +21,8 @@ namespace analise_libvlc
         private List<String> _playlist = new List<string>(1);
         private ContextMenuStrip _playlistContextMenuStrip;
 
+        private int _step = 3000;
+
         public Form2()
         {
             if (!DesignMode)
@@ -45,10 +47,10 @@ namespace analise_libvlc
             _mp.EndReached += new EventHandler<EventArgs>(On_EndReached);
             _mp.Stopped += new EventHandler<EventArgs>(On_Stopped);
             _mp.TimeChanged += new EventHandler<MediaPlayerTimeChangedEventArgs>(On_MediaPlayerTimerChanged);
-
+            
             // cria um timer.
             _aTimer = new Timer();
-            _aTimer.Tick += new EventHandler(On_timer_Tick);
+            _aTimer.Tick += new EventHandler(On_TimerTick);
             _aTimer.Interval = 300;
             _aTimer.Enabled = true;
 
@@ -109,7 +111,7 @@ namespace analise_libvlc
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
         }
 
-        private void save2TXT()
+        private void Save2TXT()
         {
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "*.rtf|*.rtf";
@@ -127,7 +129,7 @@ namespace analise_libvlc
 
         public void insertMediaTimetoText()
         {
-            if (mediaPlayerNotOK()) return;
+            if (MediaPlayerNotOK()) return;
 
             int index = richTextBox1.SelectionStart;
             int line = richTextBox1.GetLineFromCharIndex(index);
@@ -151,7 +153,7 @@ namespace analise_libvlc
             MessageBox.Show("cursor at line " + line.ToString() + ": " + richTextBox1.Lines[line]);
         }
 
-        public void pasteClipboard()
+        public void PasteFromClipboard(object sender, EventArgs e)
         {
             DataFormats.Format format1 = DataFormats.GetFormat(DataFormats.Bitmap);
             DataFormats.Format format2 = DataFormats.GetFormat(DataFormats.Text);
@@ -166,21 +168,21 @@ namespace analise_libvlc
             }
         }
 
-        public void copytoClipboard()
+        public void CopytoClipboard(object sender, EventArgs e)
         {
             richTextBox1.Copy();
         }
 
-        public void cuttoClipboard()
+        public void CuttoClipboard(object sender, EventArgs e)
         {
             richTextBox1.Cut();
         }
 
-        private void atualizaPlaylist()
+        private void AtualizaPlaylist()
         {
             void ToolStripMenuItemClick(object sender, EventArgs e)
             {
-                openMediaFile((sender as ToolStripMenuItem).Text);
+                OpenMediaFile((sender as ToolStripMenuItem).Text);
             }
 
             void ToolStripMenuItemRClick()
@@ -203,13 +205,22 @@ namespace analise_libvlc
             }
         }
 
-        private void openMediaFile(String filePath)
+        private void OpenMediaFile(String filePath) // abre para reprodução de UM arquivo de mídia
         {
             if ((filePath == null) || (filePath == String.Empty)) return;
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show("Arquivo não encontrado! ");
+                return;
+            }
+
             try
             {
                 var media = new Media(_libVLC, new Uri(filePath));
-
+                
+                // se tiver stream de vídeo cria outra janela? mas com foco no richtext
+                _mp.Hwnd = base.Handle;
+                
                 if (!_mp.Play(media))
                     MessageBox.Show("erro na reprodução!");
                 media.Dispose();
@@ -220,10 +231,10 @@ namespace analise_libvlc
             }
 
             // atualiza playlist            
-            atualizaPlaylist();
+            AtualizaPlaylist();
         }
 
-        private void PlayPause()
+        private void PlayPause(object sender, EventArgs e)
         {
             if (_mp.State == VLCState.Stopped)
             {
@@ -234,28 +245,108 @@ namespace analise_libvlc
             _mp.SetPause(_mp.IsPlaying);
         }
 
-        private void Stop()
+        private void Stop(object sender, EventArgs e)
         {
             _mp.Stop();
         }
 
-        private void Backward() // pagedown
+        private void Backward(object sender, EventArgs e) // pagedown
         {            
             if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
-                _mp.Time -= 3000;
+                _mp.Time -= _step;
         }
 
-        private void Forward() // pageup
+        private void Forward(object sender, EventArgs e) // pageup
         {
             if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
             {
                 var len = _mp.Length;
                 var time = _mp.Time;
-                _mp.Time += time + 3000 > len ? len - time : 3000;
+                _mp.Time += time + _step > len ? len - time : _step;
             }
         }
 
-        private void getMediaInfo(Media media)
+        private void GetPicture()
+        {
+            //const char *image_path="/home/vinay/Documents/snap.png";
+            //int result = libvlc_video_take_snapshot(mp, 0, image_path, 0, 0);
+            // parece que "file:" está atrapalhando...                       
+
+            //obtém dimensões informações sobre o frame
+            var vtrackidx = _mp.VideoTrack; // obtém índice da stream do fluxo de vídeo
+            if (vtrackidx < 0) return;
+
+            var info = _mp.Media.Tracks;
+            long time = _mp.Time;
+
+            uint w = _mp.Media.Tracks[vtrackidx].Data.Video.Width;
+            uint h = _mp.Media.Tracks[vtrackidx].Data.Video.Height;
+
+            String _path = _mp.Media.Mrl;
+            _path = _path.Replace("file:///", ""); // retira o termo "file:///" que vem na string Mrl...
+                                                   //_path = _path.Substring(8); 
+            String image_path = Path.GetDirectoryName(_path) + "\\" + // constroi nome único
+                                Path.GetFileNameWithoutExtension(_path) +
+                                "-" + time.ToString() + ".png";
+
+            // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
+            if (_mp.TakeSnapshot(0, image_path, w, h))
+                MessageBox.Show("Arquivo " + Path.GetFileNameWithoutExtension(_path)
+                    + " salvo com sucesso na pasta " + Path.GetDirectoryName(_path));
+        }
+
+        private int CalcProgressBarRelativeMouse(object sender, EventArgs e)
+        {
+            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
+            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
+            // Calculate the factor for converting the position (progbarWidth/100) //
+            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
+            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
+            float relativeMouse = absoluteMouse / calcFactor;
+
+            return Convert.ToInt32(relativeMouse);
+        }
+
+        private bool MediaPlayerNotOK()
+        {
+            return ((_mp == null) || (_mp.Media == null));
+        }
+
+        #endregion
+
+        #region handlers menu e toolbar
+        private void abrirToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var filePath = String.Empty;
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Multiselect = true;
+                openFileDialog.Filter = "All files (*.*)|*.*";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var _plTemp = openFileDialog.FileNames;
+                    _playlist.AddRange(openFileDialog.FileNames); // armazena nomes de arquivos selecionados na _playlist
+                    _playlist = _playlist.Distinct().ToList(); // remove duplicados
+
+                    filePath = openFileDialog.FileName; // pega primeiro da lista selecionada e inicia a reprodução
+                    OpenMediaFile(filePath); // reproduz a mídia e atualiza a playlist da janela
+                    //AtualizaPlaylist();
+                }
+            }
+        }
+
+        private void abrirURLToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var filePath = ShowDialog("Entre com a URL", "URL: ");
+            if (filePath != string.Empty)
+            {
+                OpenMediaFile(filePath);
+            }
+        }
+
+        private void informaçõesDaMídiaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string FromFourCC(UInt32 fourCC)
             {
@@ -267,7 +358,8 @@ namespace analise_libvlc
                     (char)(fourCC >> 24 & 0xff));
             }
 
-            if (mediaPlayerNotOK()) return;
+            if (MediaPlayerNotOK()) return;
+            Media media = _mp.Media;
 
             String songMetadata = "Informações da mídia atual: \r\n";
             songMetadata += "URL: " + new Uri(media.Mrl) + "\r\n\r\n";
@@ -301,108 +393,47 @@ namespace analise_libvlc
             MessageBox.Show(songMetadata);
         }
 
-        private void GetPicture()
+        private void salvarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //const char *image_path="/home/vinay/Documents/snap.png";
-            //int result = libvlc_video_take_snapshot(mp, 0, image_path, 0, 0);
-            // parece que "file:" está atrapalhando...                       
-
-            //obtém dimensões informações sobre o frame
-            var vtrackidx = _mp.VideoTrack; // obtém índice da stream do fluxo de vídeo
-            if (vtrackidx < 0) return;
-
-            var info = _mp.Media.Tracks;
-            long time = _mp.Time;
-
-            uint w = _mp.Media.Tracks[vtrackidx].Data.Video.Width;
-            uint h = _mp.Media.Tracks[vtrackidx].Data.Video.Height;
-
-            String _path = _mp.Media.Mrl;
-            _path = _path.Replace("file:///", ""); // retira o termo "file:///" que vem na string Mrl...
-                                                   //_path = _path.Substring(8); 
-            String image_path = Path.GetDirectoryName(_path) + "\\" + // constroi nome único
-                                Path.GetFileNameWithoutExtension(_path) +
-                                "-" + time.ToString() + ".png";
-
-            // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
-            if (_mp.TakeSnapshot(0, image_path, w, h))
-                MessageBox.Show("Arquivo " + Path.GetFileNameWithoutExtension(_path)
-                    + " salvo com sucesso na pasta " + Path.GetDirectoryName(_path));
+            Save2TXT();
         }
 
-        private int progressBarRelativeMouseClick(object sender, EventArgs e)
+        private void progressBar1_Click(object sender, EventArgs e)
         {
-            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
-            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
-            // Calculate the factor for converting the position (progbarWidth/100) //
-            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
-            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
-            float relativeMouse = absoluteMouse / calcFactor;
+            if (MediaPlayerNotOK()) return;
 
-            return Convert.ToInt32(relativeMouse);
+            int pos = CalcProgressBarRelativeMouse(sender, e); // retorna um inteiro [0:100] com a posição do clique
+            if (pos >= 0)
+                _mp.Position = (float)pos / 100;
         }
 
-        private bool mediaPlayerNotOK()
+        private void progressBar1_MouseMove(object sender, MouseEventArgs e)
         {
-            return ((_mp == null) || (_mp.Media == null));
+            char pad = '0';
+            int pos = CalcProgressBarRelativeMouse(sender, e);
+            if (pos >= 0)
+                statusLabel1.Text = "Ir para posição: " + pos.ToString().PadLeft(3, pad);
         }
 
-        #endregion
-
-        #region handlers menu e toolbar
-        private void abrirToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void carregarTextoToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (MediaPlayerNotOK()) return;
+
             var filePath = String.Empty;
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Multiselect = true;
-                openFileDialog.Filter = "All files (*.*)|*.*";
+                openFileDialog.Multiselect = false;
+                openFileDialog.Filter = "All files (*.rtf)|*.rtf";
+                openFileDialog.InitialDirectory = Path.GetDirectoryName(_mp.Media.Mrl);
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    var _plTemp = openFileDialog.FileNames;
-                    _playlist.AddRange(openFileDialog.FileNames); // armazena nomes de arquivos selecionados na _playlist
-                    _playlist = _playlist.Distinct().ToList(); // remove duplicados
-
-                    filePath = openFileDialog.FileName; // pega primeiro da lista selecionada e inicia a reprodução
-                    openMediaFile(filePath);
+                    filePath = openFileDialog.FileName;
+                    if (File.Exists(filePath))
+                        richTextBox1.LoadFile(filePath);
                 }
             }
-        }
-
-        private void abrirURLToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            var filePath = ShowDialog("Entre com a URL", "URL: ");
-            if (filePath != string.Empty)
-            {
-                openMediaFile(filePath);
-            }
-        }
-
-        private void informaçõesDaMídiaToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            getMediaInfo(_mp.Media);
-        }
-
-        private void salvarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            save2TXT();
-        }
-
-        private void colarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            pasteClipboard();
-        }
-
-        private void copiarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            copytoClipboard();
-        }
-
-        private void recortarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            cuttoClipboard();
         }
 
         #endregion
@@ -437,9 +468,9 @@ namespace analise_libvlc
             ////_mp.Stop();
         }
 
-        private void On_timer_Tick(object sender, EventArgs e)
+        private void On_TimerTick(object sender, EventArgs e)
         {
-            if (mediaPlayerNotOK()) return;
+            if (MediaPlayerNotOK()) return;
 
             //return;
             //if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing) || (_mp.State == VLCState.Stopped))
@@ -458,6 +489,7 @@ namespace analise_libvlc
             int val = Convert.ToInt32(pos * 100);
             val = val >= 0 & val <= 100 ? val : 0;
             progressBar1.Value = val;
+            trackBar1.Value = val;
 
             // atualiza caption
             this.Text = _state.ToString() + " @rate " + _rate.ToString() +
@@ -473,6 +505,7 @@ namespace analise_libvlc
             {
                 Text = capt;
                 progressBar1.Value = val;
+                trackBar1.Value = val;
             }
 
             // intervalo???
@@ -521,25 +554,27 @@ namespace analise_libvlc
             //var media = new Media(_libVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
             //_mp.Play(media);
             //media.Dispose();
-
-            openMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+            string fpath = Directory.GetCurrentDirectory() + "/media/teste.mp3";
+            _playlist.Add(fpath);
+            OpenMediaFile(fpath);
+            //openMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
         }
 
         private void On_FormKeyDown(object sender, KeyEventArgs e)
         {
-            if (mediaPlayerNotOK()) return;
+            if (MediaPlayerNotOK()) return;
 
             switch (e.KeyCode)
             {
                 case Keys.Escape: // pausa simples
                     {
-                        Stop();                        
+                        Stop(null, null);                        
                         break;
                     }
                 case Keys.Space: // pausa simples
                     {
                         if (!richTextBox1.Focused)
-                            _mp.SetPause(_mp.IsPlaying);
+                            PlayPause(null, null);
                         break;
                     }
                 case Keys.Subtract: // diminui velocidade de reprodução
@@ -570,14 +605,14 @@ namespace analise_libvlc
                             _mp.SetPause(true);
                         else
                         {
-                            _mp.Time -= 3000;
+                            _mp.Time -= _step;
                             _mp.SetPause(false);
                         }
                         break;
                     }
                 case Keys.F2: // pausa/play simples
                     {
-                        PlayPause();
+                        PlayPause(null, null);
                         break;
                     }
                 case Keys.F6: // take a snapshot
@@ -597,68 +632,27 @@ namespace analise_libvlc
                     }
                 case Keys.F12: // salvar texto
                     {
-                        save2TXT();
+                        Save2TXT();
                         break;
                     }
                 case Keys.PageDown: // retorna xx milisegundos (to do: implementar avançar frame a frame!)
                     {
                         if (richTextBox1.Focused)
                             e.SuppressKeyPress = true;
-                        Backward();                        
+                        Backward(null, null);                        
                         break;
                     }
                 case Keys.PageUp: // avança xx milisegundos
                     {                        
                         if (richTextBox1.Focused)
                             e.SuppressKeyPress = true;
-                        Forward();
+                        Forward(null, null);
                         break;
                     }
             }
         }
-
-        private void progressBar1_Click(object sender, EventArgs e)
-        {
-            if (mediaPlayerNotOK()) return;
-
-            int pos = progressBarRelativeMouseClick(sender, e); // retorna um inteiro [0:100] com a posição do clique
-            if (pos >= 0)
-                _mp.Position = (float)pos / 100;
-        }
-
-        private void progressBar1_MouseMove(object sender, MouseEventArgs e)
-        {
-            char pad = '0';
-            int pos = progressBarRelativeMouseClick(sender, e);
-            if (pos >= 0)
-                statusLabel1.Text = "Ir para posição: " + pos.ToString().PadLeft(3, pad);
-        }
-
-        private void carregarTextoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (mediaPlayerNotOK()) return;
-
-            var filePath = String.Empty;
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Multiselect = false;
-                openFileDialog.Filter = "All files (*.rtf)|*.rtf";
-                openFileDialog.InitialDirectory = Path.GetDirectoryName(_mp.Media.Mrl);
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    filePath = openFileDialog.FileName;
-                    if (File.Exists(filePath))
-                        richTextBox1.LoadFile(filePath);
-                }
-            }
-        }
-
-
-
+        
         #endregion
-
     }
 
 }

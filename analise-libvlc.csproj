@@ -6,7 +6,6 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<RootNamespace></RootNamespace>
 		<StartupObject>analise_libvlc.Program</StartupObject>
-		<PublishSingleFile>true</PublishSingleFile>
 		<Description>Análise de conteúdo com dotNET</Description>
 	</PropertyGroup>
 	<ItemGroup>
@@ -15,9 +14,6 @@
 	<ItemGroup>
 		<Reference Include="LibVLCSharp">
 			<HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp\bin\Win32Debug\net6.0-windows\LibVLCSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="LibVLCSharp.WinForms">
-			<HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp.WinForms\bin\Win32Debug\netcoreapp3.1\LibVLCSharp.WinForms.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
