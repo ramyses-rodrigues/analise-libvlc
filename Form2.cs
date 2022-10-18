@@ -219,7 +219,7 @@ namespace analise_libvlc
                 var media = new Media(_libVLC, new Uri(filePath));
                 
                 // se tiver stream de vídeo cria outra janela? mas com foco no richtext
-                _mp.Hwnd = base.Handle;
+                //_mp.Hwnd = base.Handle; // handle do form principal. TO DO: Criar outra janela
                 
                 if (!_mp.Play(media))
                     MessageBox.Show("erro na reprodução!");
@@ -402,17 +402,21 @@ namespace analise_libvlc
         {
             if (MediaPlayerNotOK()) return;
 
-            int pos = CalcProgressBarRelativeMouse(sender, e); // retorna um inteiro [0:100] com a posição do clique
+            int pos = CalcProgressBarRelativeMouse(sender, e); // retorna um inteiro [0:100] com a posição relativa do mouse sobre a barra
             if (pos >= 0)
                 _mp.Position = (float)pos / 100;
         }
 
         private void progressBar1_MouseMove(object sender, MouseEventArgs e)
         {
-            char pad = '0';
-            int pos = CalcProgressBarRelativeMouse(sender, e);
-            if (pos >= 0)
-                statusLabel1.Text = "Ir para posição: " + pos.ToString().PadLeft(3, pad);
+            if (MediaPlayerNotOK()) return;
+            
+            int pos = CalcProgressBarRelativeMouse(sender, e); // retorna um inteiro [0:100] com a posição relativa do mouse
+            var iPos = (pos * _mp.Length / 100);
+
+            // converte para formato de hh:min:seg
+            TimeSpan ts = TimeSpan.FromMilliseconds(iPos > 0 & iPos < _mp.Length ? iPos : 0);
+            statusLabel1.Text = "Ir para posição: " + ts.ToString(@"hh\:mm\:ss");
         }
 
         private void carregarTextoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -489,8 +493,7 @@ namespace analise_libvlc
             int val = Convert.ToInt32(pos * 100);
             val = val >= 0 & val <= 100 ? val : 0;
             progressBar1.Value = val;
-            trackBar1.Value = val;
-
+ 
             // atualiza caption
             this.Text = _state.ToString() + " @rate " + _rate.ToString() +
                         " - " + ts.ToString(@"hh\:mm\:ss") +
@@ -505,7 +508,6 @@ namespace analise_libvlc
             {
                 Text = capt;
                 progressBar1.Value = val;
-                trackBar1.Value = val;
             }
 
             // intervalo???
