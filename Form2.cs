@@ -131,26 +131,34 @@ namespace analise_libvlc
         {
             if (MediaPlayerNotOK()) return;
 
-            int index = richTextBox1.SelectionStart;
-            int line = richTextBox1.GetLineFromCharIndex(index);
-
-            var ctime = _mp.Time; // posição da stream em milisegundos
-            // converte para formato de hh:min:seg
+            var ctime = _mp.Time; // posição da stream em milisegundos e converte parA Timespan
             TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < _mp.Length ? ctime : 0);
 
             string strText = "Posição " + ts.ToString(@"hh\:mm\:ss") + " - (" +
                                   (_mp.Time >= 0 ? _mp.Time.ToString() : "0") + ")\r\n";
-            richTextBox1.AppendText(strText); // insere texto na posição do cursor
+            
+            richTextBox1.AppendText(strText); // insere texto na posição atual do cursor
 
         }
 
-        public void GetMediaTimefromText()
+        public void GoToMediaTimefromLineText()
         {
+            if (MediaPlayerNotOK()) return;
             if (richTextBox1.Lines.Length <= 0) return;
 
-            int index = richTextBox1.SelectionStart;
-            int line = richTextBox1.GetLineFromCharIndex(index);
-            MessageBox.Show("cursor at line " + line.ToString() + ": " + richTextBox1.Lines[line]);
+            int index = richTextBox1.SelectionStart; // obtém a posição do caracter
+            int line = richTextBox1.GetLineFromCharIndex(index); // obtém o indice da linha
+            var sLine = richTextBox1.Lines[line]; // obtém o texto da linha
+            int startIndex = sLine.LastIndexOf('(') + 1;
+            int endIndex = sLine.LastIndexOf(')');
+
+            // extrai valor em milisegundos da linha
+            var iTime = sLine.Substring(startIndex, endIndex - startIndex);
+            //MessageBox.Show("Cursor na linha " + line.ToString() + ": " + iTime.ToString());
+            
+            // posiciona a mídia no instante desejado
+            _mp.Time = Convert.ToInt64(iTime);
+
         }
 
         public void PasteFromClipboard(object sender, EventArgs e)
@@ -629,7 +637,7 @@ namespace analise_libvlc
                     }
                 case Keys.F8: // ir para tempo a partir do texto
                     {
-                        GetMediaTimefromText();
+                        GoToMediaTimefromLineText();
                         break;
                     }
                 case Keys.F12: // salvar texto
