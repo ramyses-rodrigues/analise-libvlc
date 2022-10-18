@@ -154,10 +154,11 @@ namespace analise_libvlc
 
             // extrai valor em milisegundos da linha
             var iTime = sLine.Substring(startIndex, endIndex - startIndex);
+            
+            // testes
             //MessageBox.Show("Cursor na linha " + line.ToString() + ": " + iTime.ToString());
             
-            // posiciona a mídia no instante desejado
-            _mp.Time = Convert.ToInt64(iTime);
+            _mp.Time = Convert.ToInt64(iTime); // posiciona a mídia no instante desejado
 
         }
 
