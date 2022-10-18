@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using LibVLCSharp.Shared;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace analise_libvlc
 {
@@ -47,7 +48,10 @@ namespace analise_libvlc
             _mp.EndReached += new EventHandler<EventArgs>(On_EndReached);
             _mp.Stopped += new EventHandler<EventArgs>(On_Stopped);
             _mp.TimeChanged += new EventHandler<MediaPlayerTimeChangedEventArgs>(On_MediaPlayerTimerChanged);
-            
+            _mp.Forward += new EventHandler<EventArgs>(On_MediaPlayerForward);
+            _mp.Backward += new EventHandler<EventArgs>(On_MediaPlayerBackward);
+
+
             // cria um timer.
             _aTimer = new Timer();
             _aTimer.Tick += new EventHandler(On_TimerTick);
@@ -260,19 +264,35 @@ namespace analise_libvlc
         }
 
         private void Backward(object sender, EventArgs e) // pagedown
-        {            
-            if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
-                _mp.Time -= _step;
+        {
+            customSetPos(_mp.Time - _step);
+        }
+
+        private void customSetPos(long pos)
+        {
+            if (!_mp.IsPlaying)
+            {
+                _mp.Play(); //otherwise not seekable for some silly reason
+                _mp.Time = pos;
+                _mp.Pause();
+            }
+            else
+            {
+                _mp.Time = pos;
+            }
         }
 
         private void Forward(object sender, EventArgs e) // pageup
         {
-            if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing))
-            {
-                var len = _mp.Length;
-                var time = _mp.Time;
-                _mp.Time += time + _step > len ? len - time : _step;
-            }
+            customSetPos(_mp.Time + _step);
+            return;
+            //// testes
+            //if ((_mp.State == VLCState.Paused) || (_mp.IsPlaying))
+            //{
+            //    var len = _mp.Length;
+            //    var time = _mp.Time;
+            //    _mp.Time += time + _step > len ? len - time : _step;
+            //}
         }
 
         private void GetPicture()
@@ -550,6 +570,16 @@ namespace analise_libvlc
 
             //statusLabel1.Text = TimeSpan.FromMilliseconds(e.Time).ToString().Substring(0, 8);
             //}
+        }
+
+        private void On_MediaPlayerForward(object sender, EventArgs e)
+        { 
+           // implementar ações
+        }
+
+        private void On_MediaPlayerBackward(object sender, EventArgs e)
+        {
+            //implementar ações
         }
 
         private void On_FormClosed(object sender, FormClosedEventArgs e)
