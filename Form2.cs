@@ -90,6 +90,19 @@ namespace analise_libvlc
 
             // formatação da caixa de texto
             richTextBox1.Font = new Font(richTextBox1.Font.FontFamily, 12);
+
+            // handler para lista de opções de _step
+            String[] stepList = { "30", "500", "1000", "2000", "3000" }; // valores em milisegundos
+            void hStepComboBoxClick(object sender, EventArgs e)
+            {
+                this._step = int.Parse((sender as ToolStripComboBox).Text);
+            }
+            cbStepList.Items.Clear();
+            for (int i = 0; i < stepList.Length; i++)
+            {
+                cbStepList.Items.Add(stepList[i]); //
+            }
+            cbStepList.Click += new EventHandler(hStepComboBoxClick); // associa handler para click
         }
 
         #region Funções utilitárias
@@ -249,12 +262,16 @@ namespace analise_libvlc
 
         private void PlayPause(object sender, EventArgs e)
         {
-            if (_mp.State == VLCState.Stopped)
+            // houve necessidade de implementar com os argumentos sender e "e" porque essa função foi ligada
+            // ao evendo do botão Play/Pause de forma dinâmica, na inicialização do Form
+
+            if (!_mp.IsPlaying)
             {
-                _mp.Play(); // reproduz do início
-                return;
+                _mp.Play(); // coloca em estado de reprodução para possibilitar o seek e/ou pause
             }
 
+            // Todo: quando chega ao final do fluxo (State == Ended), só depois que clica em Stop ele é capaz de reproduzir de novo
+            // corrigir!
             _mp.SetPause(_mp.IsPlaying);
         }
 
@@ -343,7 +360,7 @@ namespace analise_libvlc
 
         #endregion
 
-        #region handlers menu e toolbar
+        #region handlers de menu e toolbar
         private void abrirToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             var filePath = String.Empty;
@@ -636,19 +653,11 @@ namespace analise_libvlc
                     }
                 case Keys.F1: // pausa/play com retorno
                     {
-                        if (_mp.State == VLCState.Stopped)
-                        {
-                            _mp.Play(); // reproduz do início
-                            break;
-                        }
-
+                        // se estiver reproduzindo, volta _step milissegundos e aguarda para reproduzir
                         if (_mp.IsPlaying)
-                            _mp.SetPause(true);
-                        else
-                        {
-                            _mp.Time -= _step;
-                            _mp.SetPause(false);
-                        }
+                           customSetPos(_mp.Time - _step);
+                        PlayPause(null, null);
+
                         break;
                     }
                 case Keys.F2: // pausa/play simples

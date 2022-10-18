@@ -77,7 +77,7 @@
             this.ajudaToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.tsPlaylist = new System.Windows.Forms.ToolStripDropDownButton();
-            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+            this.cbStepList = new System.Windows.Forms.ToolStripComboBox();
             this.tsRate = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -387,7 +387,7 @@
             this.ajudaToolStripButton,
             this.toolStripSeparator8,
             this.tsPlaylist,
-            this.toolStripComboBox1,
+            this.cbStepList,
             this.tsRate,
             this.toolStripButPlayPause,
             this.toolStripButStop,
@@ -497,11 +497,11 @@
             this.tsPlaylist.Size = new System.Drawing.Size(69, 25);
             this.tsPlaylist.Text = "Playlist";
             // 
-            // toolStripComboBox1
+            // cbStepList
             // 
-            this.toolStripComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 28);
+            this.cbStepList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbStepList.Name = "cbStepList";
+            this.cbStepList.Size = new System.Drawing.Size(121, 28);
             // 
             // tsRate
             // 
@@ -708,7 +708,7 @@
         private System.Windows.Forms.ToolStripButton ajudaToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.ToolStripDropDownButton tsPlaylist;
-        private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
+        private System.Windows.Forms.ToolStripComboBox cbStepList;
         private System.Windows.Forms.ToolStripDropDownButton tsRate;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
