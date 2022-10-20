@@ -95,14 +95,18 @@ namespace analise_libvlc
             String[] stepList = { "30", "500", "1000", "2000", "3000" }; // valores em milisegundos
             void hStepComboBoxClick(object sender, EventArgs e)
             {
+                if (cbStepList.SelectedIndex >=0)
                 this._step = int.Parse((sender as ToolStripComboBox).Text);
             }
+
             cbStepList.Items.Clear();
             for (int i = 0; i < stepList.Length; i++)
             {
                 cbStepList.Items.Add(stepList[i]); //
             }
-            cbStepList.Click += new EventHandler(hStepComboBoxClick); // associa handler para click
+            cbStepList.SelectedIndex = 4;// padrão 3000
+            cbStepList.SelectedIndexChanged += new EventHandler(hStepComboBoxClick); // associa handler para click
+            
         }
 
         #region Funções utilitárias
@@ -280,11 +284,6 @@ namespace analise_libvlc
             _mp.Stop();
         }
 
-        private void Backward(object sender, EventArgs e) // pagedown
-        {
-            customSetPos(_mp.Time - _step);
-        }
-
         private void customSetPos(long pos)
         {
             if (!_mp.IsPlaying)
@@ -297,6 +296,11 @@ namespace analise_libvlc
             {
                 _mp.Time = pos;
             }
+        }
+
+        private void Backward(object sender, EventArgs e) // pagedown
+        {
+            customSetPos(_mp.Time - _step);
         }
 
         private void Forward(object sender, EventArgs e) // pageup
