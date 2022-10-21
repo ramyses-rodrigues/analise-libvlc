@@ -89,7 +89,7 @@
             this.toolStripButForward = new System.Windows.Forms.ToolStripButton();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.rtTextBox = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -592,15 +592,15 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // richTextBox1
+            // rtTextBox
             // 
-            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.richTextBox1.EnableAutoDragDrop = true;
-            this.richTextBox1.Location = new System.Drawing.Point(0, 179);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(800, 535);
-            this.richTextBox1.TabIndex = 4;
-            this.richTextBox1.Text = "";
+            this.rtTextBox.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.rtTextBox.EnableAutoDragDrop = true;
+            this.rtTextBox.Location = new System.Drawing.Point(0, 179);
+            this.rtTextBox.Name = "rtTextBox";
+            this.rtTextBox.Size = new System.Drawing.Size(800, 535);
+            this.rtTextBox.TabIndex = 4;
+            this.rtTextBox.Text = "";
             // 
             // statusStrip1
             // 
@@ -635,7 +635,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 714);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.rtTextBox);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.Name = "Form2";
@@ -689,7 +689,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem informaçõesDaMídiaToolStripMenuItem;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox rtTextBox;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel1;
