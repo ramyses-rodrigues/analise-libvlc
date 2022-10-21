@@ -527,31 +527,12 @@ namespace analise_libvlc
         #region manipuladores de eventos de componentes, controles de formulário e timer
         private void On_EndReached(object sender, EventArgs e)
         {
-            // verifica a mídia em reprodução atual para inserir marcação no item, se for o caso
-            //var sfile = new Uri(_mp.Media.Mrl); // transforma no formato uri para ser possível comparar
-            //MessageBox.Show("Final da stream: " + sfile.ToString());
-            //_mp.Stop();
-            //openMediaFile(sfile.ToString());
-            //var aUri = new Uri(tsPlaylist.DropDownItems[idx].Text);
-            //if (aUri == list) ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
-            //_mp.Media = _mp.Media;
-            //_mp.Stop();
+            // passar para a próxima mídia da playlist?
         }
 
         private void On_Stopped(object sender, EventArgs e)
         {
-            // atualiza caption
-            //this.Text = _mp.State.ToString() + " @rate " + _mp.Rate.ToString();
-
-            //// verifica a mídia em reprodução atual para inserir marcação no item, se for o caso
-            //var sfile = new Uri(_mp.Media.Mrl); // transforma no formato uri para ser possível comparar
-            //MessageBox.Show("Parou a reprodução do item: " + sfile.ToString());
-            ////_mp.Stop();
-            ////openMediaFile(sfile.ToString());
-            ////var aUri = new Uri(tsPlaylist.DropDownItems[idx].Text);
-            ////if (aUri == list) ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
-            ////_mp.Media = _mp.Media;
-            ////_mp.Stop();
+            // fazer alguma coisa?            
         }
 
         private void On_TimerTick(object sender, EventArgs e)

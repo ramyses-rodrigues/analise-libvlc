@@ -547,7 +547,7 @@
             this.toolStripButPlayPause.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButPlayPause.Name = "toolStripButPlayPause";
             this.toolStripButPlayPause.Size = new System.Drawing.Size(29, 25);
-            this.toolStripButPlayPause.Text = "toolStripButton1";
+            this.toolStripButPlayPause.Text = "Play/Pausa";
             this.toolStripButPlayPause.Click += new System.EventHandler(this.PlayPause);
             // 
             // toolStripButStop
@@ -557,7 +557,7 @@
             this.toolStripButStop.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButStop.Name = "toolStripButStop";
             this.toolStripButStop.Size = new System.Drawing.Size(29, 25);
-            this.toolStripButStop.Text = "toolStripButton1";
+            this.toolStripButStop.Text = "Parar";
             this.toolStripButStop.Click += new System.EventHandler(this.Stop);
             // 
             // toolStripButBackward
@@ -567,7 +567,7 @@
             this.toolStripButBackward.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButBackward.Name = "toolStripButBackward";
             this.toolStripButBackward.Size = new System.Drawing.Size(29, 25);
-            this.toolStripButBackward.Text = "toolStripButton1";
+            this.toolStripButBackward.Text = "Back";
             this.toolStripButBackward.Click += new System.EventHandler(this.Backward);
             // 
             // toolStripButForward
@@ -577,7 +577,7 @@
             this.toolStripButForward.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButForward.Name = "toolStripButForward";
             this.toolStripButForward.Size = new System.Drawing.Size(29, 25);
-            this.toolStripButForward.Text = "toolStripButton1";
+            this.toolStripButForward.Text = "Forward";
             this.toolStripButForward.Click += new System.EventHandler(this.Forward);
             // 
             // toolStripMenuItem5
