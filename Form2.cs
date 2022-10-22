@@ -77,20 +77,20 @@ namespace analise_libvlc
             DragOver += new DragEventHandler(On_FormDragOver);
             DragDrop += new DragEventHandler(On_FormDragDrop);
 
-            // handler para lista de opções de velocidade
-            String[] rateList = { "0,5", "1,0", "1,5", "2,0" };
+            // handler para lista de opções de velocidade            
             void ToolStripMenuItemClick(object sender, EventArgs e)
             {
-                _mp.SetRate(float.Parse((sender as ToolStripMenuItem).Text));
+                if ((sender as ToolStripMenuItem).Text != String.Empty)
+                    _mp.SetRate(float.Parse((sender as ToolStripMenuItem).Text));
             }
 
             // atualiza itens na tsRate
+            String[] rateList = { "0,5", "1,0", "1,5", "2,0" };
             tsRate.DropDownItems.Clear();
             for (int i = 0; i < rateList.Length; i++)
             {
                 tsRate.DropDownItems.Add(rateList[i]); //
                 tsRate.DropDownItems[i].Click += new EventHandler(ToolStripMenuItemClick); // associa handler para click
-                //playlist.DropDownItems[i].
             }
 
             // menus de contexto
@@ -98,19 +98,17 @@ namespace analise_libvlc
             _playlistContextMenuStrip.Items.Add(new ToolStripMenuItem("Apagar item"));
             _playlistContextMenuStrip.Items.Add(new ToolStripMenuItem("Reproduzir item"));
 
-            //playlist.DropDownItems.AddRange(_playlistContextMenuStrip);
-
             // formatação da caixa de texto
             rtTextBox.Font = new Font(rtTextBox.Font.FontFamily, 12);
 
-            // handler para lista de opções de _step
-            String[] stepList = { "30", "500", "1000", "2000", "3000" }; // valores em milisegundos
+            // handler para lista de opções de _step            
             void hStepComboBoxClick(object sender, EventArgs e)
             {
-                if (cbStepList.SelectedIndex >= 0)
+                if ((sender as ToolStripComboBox).SelectedIndex >= 0)
                     this._step = int.Parse((sender as ToolStripComboBox).Text);
             }
 
+            String[] stepList = { "30", "500", "1000", "2000", "3000" }; // valores em milisegundos
             cbStepList.Items.Clear();
             for (int i = 0; i < stepList.Length; i++)
             {
@@ -563,45 +561,7 @@ namespace analise_libvlc
         public delegate void OnMediaPlayerTimerChangedDelegate(String txt, int v);
         private void On_MediaPlayerTimerChanged(object sender, MediaPlayerTimeChangedEventArgs e)
         {
-            // corrigir problemas...
-
-            //void SetFormCaption(String capt, int val)
-            //{
-            //    Text = capt;
-            //    progressBar1.Value = val;
-            //}
-
-            //// intervalo???
-            //return;
-            ////if (mediaPlayerNotOK()) return;
-            ////if ((_mp.State == VLCState.Paused) || (_mp.State == VLCState.Playing) || (_mp.State == VLCState.Stopped))
-            ////{
-            //var pos = _mp.Position; // obtém a posição da stream em percentual
-            //var length = _mp.Length; // tamanho total da string em milisegundos 
-            //var ctime = e.Time; // posição da stream em milisegundos
-            //var _state = _mp.State;
-            //var _rate = _mp.Rate;
-
-            //// converte para formato de hh:min:seg
-            //TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < length ? ctime : 0);
-            //TimeSpan tsTotal = TimeSpan.FromMilliseconds(length > 0 ? length : 0);
-
-            //// atualiza progressbar
-            //int val = Convert.ToInt32(pos * 100);
-            //val = val >= 0 & val <= 100 ? val : 0;
-
-            //String text = _state.ToString() + " @rate " + _rate.ToString() +
-            //            " - " + ts.ToString(@"hh\:mm\:ss") +
-            //            " / " + tsTotal.ToString(@"hh\:mm\:ss");
-
-            //if (InvokeRequired)
-            //{
-            //    OnMediaPlayerTimerChangedDelegate callback = SetFormCaption;
-            //    Invoke(callback, text, val);
-            //}
-
-            //statusLabel1.Text = TimeSpan.FromMilliseconds(e.Time).ToString().Substring(0, 8);
-            //}
+            // corrigir problemas... funcionando com o componente Timer
         }
 
         private void On_MediaPlayerForward(object sender, EventArgs e)
@@ -623,13 +583,11 @@ namespace analise_libvlc
         }
 
         private void On_FormLoad(object sender, EventArgs e)
-        {
-            //var media = new Media(_libVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
-            //_mp.Play(media);
-            //media.Dispose();
-            string fpath = Directory.GetCurrentDirectory() + "/media/teste.mp3";
-            _playlist.Add(fpath);
-            OpenMediaFile(fpath);
+        {            
+            //string fpath = Directory.GetCurrentDirectory() + "/media/teste.mp3";
+            //_playlist.Add(fpath);
+            //OpenMediaFile(fpath);
+            
             //openMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
         }
 
