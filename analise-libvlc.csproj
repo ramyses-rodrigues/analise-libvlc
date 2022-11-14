@@ -12,9 +12,9 @@
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.17.4" />
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="LibVLCSharp">
-			<HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp\bin\Win32Debug\net6.0-windows\LibVLCSharp.dll</HintPath>
-		</Reference>
+	  <Reference Include="LibVLCSharp">
+	    <HintPath>..\..\LibVLCSharp-Git-clone\src\LibVLCSharp\bin\Win32Debug\net6.0-windows\LibVLCSharp.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Properties\Resources.Designer.cs">
