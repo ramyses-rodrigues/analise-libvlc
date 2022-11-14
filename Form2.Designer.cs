@@ -63,6 +63,7 @@
             this.pesquisarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.sobreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.guiaDeTeclasDeAtalhoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.novaToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -328,7 +329,8 @@
             this.índiceToolStripMenuItem,
             this.pesquisarToolStripMenuItem,
             this.toolStripSeparator5,
-            this.sobreToolStripMenuItem});
+            this.sobreToolStripMenuItem,
+            this.guiaDeTeclasDeAtalhoToolStripMenuItem});
             this.ajudaToolStripMenuItem.Name = "ajudaToolStripMenuItem";
             this.ajudaToolStripMenuItem.Size = new System.Drawing.Size(62, 24);
             this.ajudaToolStripMenuItem.Text = "&Ajuda";
@@ -336,31 +338,38 @@
             // sumárioToolStripMenuItem
             // 
             this.sumárioToolStripMenuItem.Name = "sumárioToolStripMenuItem";
-            this.sumárioToolStripMenuItem.Size = new System.Drawing.Size(153, 26);
+            this.sumárioToolStripMenuItem.Size = new System.Drawing.Size(254, 26);
             this.sumárioToolStripMenuItem.Text = "&Sumário";
             // 
             // índiceToolStripMenuItem
             // 
             this.índiceToolStripMenuItem.Name = "índiceToolStripMenuItem";
-            this.índiceToolStripMenuItem.Size = new System.Drawing.Size(153, 26);
+            this.índiceToolStripMenuItem.Size = new System.Drawing.Size(254, 26);
             this.índiceToolStripMenuItem.Text = "&Índice";
             // 
             // pesquisarToolStripMenuItem
             // 
             this.pesquisarToolStripMenuItem.Name = "pesquisarToolStripMenuItem";
-            this.pesquisarToolStripMenuItem.Size = new System.Drawing.Size(153, 26);
+            this.pesquisarToolStripMenuItem.Size = new System.Drawing.Size(254, 26);
             this.pesquisarToolStripMenuItem.Text = "&Pesquisar";
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(150, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(251, 6);
             // 
             // sobreToolStripMenuItem
             // 
             this.sobreToolStripMenuItem.Name = "sobreToolStripMenuItem";
-            this.sobreToolStripMenuItem.Size = new System.Drawing.Size(153, 26);
+            this.sobreToolStripMenuItem.Size = new System.Drawing.Size(254, 26);
             this.sobreToolStripMenuItem.Text = "&Sobre...";
+            // 
+            // guiaDeTeclasDeAtalhoToolStripMenuItem
+            // 
+            this.guiaDeTeclasDeAtalhoToolStripMenuItem.Name = "guiaDeTeclasDeAtalhoToolStripMenuItem";
+            this.guiaDeTeclasDeAtalhoToolStripMenuItem.Size = new System.Drawing.Size(254, 26);
+            this.guiaDeTeclasDeAtalhoToolStripMenuItem.Text = "Guia de Teclas de atalho";
+            this.guiaDeTeclasDeAtalhoToolStripMenuItem.Click += new System.EventHandler(this.guiaDeTeclasDeAtalhoToolStripMenuItem_Click);
             // 
             // panel1
             // 
@@ -718,5 +727,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButStop;
         private System.Windows.Forms.ToolStripButton toolStripButBackward;
         private System.Windows.Forms.ToolStripButton toolStripButForward;
+        private System.Windows.Forms.ToolStripMenuItem guiaDeTeclasDeAtalhoToolStripMenuItem;
     }
 }

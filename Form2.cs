@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using LibVLCSharp.Shared;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using Microsoft.VisualBasic.Devices;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace analise_libvlc
 {
@@ -173,6 +175,13 @@ namespace analise_libvlc
 
         }
 
+        public void insertStrInText(string str) // para inserir referência de falantes e outros textos
+        {
+            if (MediaPlayerNotOK()) return;
+
+            rtTextBox.AppendText(str); // insere texto na posição atual do cursor
+        }
+
         public void GoToMediaTimefromLineText()
         {
             if (MediaPlayerNotOK()) return;
@@ -258,7 +267,7 @@ namespace analise_libvlc
                 //var list = new Uri(_mp.Media.Mrl); // transforma no formato uri para ser possível comparar
                 //var aUri = new Uri(tsPlaylist.DropDownItems[idx].Text);
                 //if (aUri == list) ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
-                
+
                 if (new Uri(_mp.Media.Mrl) == new Uri(tsPlaylist.DropDownItems[idx].Text))
                     ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
             }
@@ -520,9 +529,37 @@ namespace analise_libvlc
             }
         }
 
+        private void guiaDeTeclasDeAtalhoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            String[] str =
+            {
+                "Funções:\n",
+"Playlist: Botão esquerdo seleciona e reproduz / botão direito apaga item da playlist\n",
+"Teclado:\n",
+"ESC: Parar\n",
+"F1: Play / Pausa com retorno de step milisegundos\n",
+"F2: Play / Pausa\n",
+"F3:\n",
+"F4:\n",
+"F5:\n",
+"F6: Inserir snapshot do vídeo no texto\n",
+"F7: Inserir instante de tempo atual no texto\n",
+"F8: Ir para instante de tempo sob o cursor do mouse\n",
+"F9:\n",
+"F10:\n",
+"F11:\n",
+"F12: Salvar texto no disco\n",
+"PAGEUP: Avançar de step milisegundos\n",
+"PAGEDOWN: Retroceder de step milisegundos\n",
+"CTRL + Seta direita: Avançar step milisegundos\n",
+"CTRL + Seta esquerda: Retroceder step milisegundos\n",
+};
+            MessageBox.Show(String.Join("", str));
+        }
+
         #endregion
 
-        #region manipuladores de eventos de componentes, controles de formulário e timer
+        #region manipuladores de eventos de componentes
         private void On_EndReached(object sender, EventArgs e)
         {
             // passar para a próxima mídia da playlist?
@@ -583,11 +620,11 @@ namespace analise_libvlc
         }
 
         private void On_FormLoad(object sender, EventArgs e)
-        {            
+        {
             //string fpath = Directory.GetCurrentDirectory() + "/media/teste.mp3";
             //_playlist.Add(fpath);
             //OpenMediaFile(fpath);
-            
+
             //openMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
         }
 
@@ -626,6 +663,12 @@ namespace analise_libvlc
 
         private void On_FormKeyDown(object sender, KeyEventArgs e)
         {
+            // função para teste do pressionamento da tecla CTRL
+            static bool IsControlDown()
+            {
+                return (Control.ModifierKeys & Keys.Control) != 0;
+            }
+
             if (MediaPlayerNotOK()) return;
 
             switch (e.KeyCode)
@@ -694,21 +737,72 @@ namespace analise_libvlc
                 case Keys.PageDown: // retorna xx milisegundos (to do: implementar avançar frame a frame!)
                     {
                         if (rtTextBox.Focused)
+                        {
                             e.SuppressKeyPress = true;
-                        Backward(null, null);
+                            Backward(null, null);
+                        }
                         break;
                     }
                 case Keys.PageUp: // avança xx milisegundos
                     {
                         if (rtTextBox.Focused)
+                        {
                             e.SuppressKeyPress = true;
-                        Forward(null, null);
+                            Forward(null, null);
+                        }
                         break;
                     }
+                case Keys.Right: // CTRl + seta direita
+                    {
+                        if (IsControlDown() && rtTextBox.Focused)
+                        {
+                            e.SuppressKeyPress = true;
+                            Forward(null, null);
+                        }
+                        break;
+                    }
+                case Keys.Left: // CTRl + seta esqueda
+                    {
+                        if (IsControlDown() && rtTextBox.Focused)
+                        {
+                            e.SuppressKeyPress = true;
+                            Backward(null, null);
+                        }
+                        break;
+                    }
+                //case Keys.D1: // CTRl + seta esqueda
+                //    {
+                //        if (IsControlDown() && rtTextBox.Focused)
+                //        {
+                //            e.SuppressKeyPress = true;
+                //            insertStrInText("M1");
+                //        }
+                //        break;
+                //    }
+                //case Keys.D2: // CTRl + seta esqueda
+                //    {
+                //        if (IsControlDown() && rtTextBox.Focused)
+                //        {
+                //            e.SuppressKeyPress = true;
+                //            insertStrInText("M2");
+                //        }
+                //        break;
+                //    }
+                //case Keys.D3: // CTRl + seta esqueda
+                //    {
+                //        if (IsControlDown() && rtTextBox.Focused)
+                //        {
+                //            e.SuppressKeyPress = true;
+                //            insertStrInText("M3");
+                //        }
+                //        break;
+                //    }
             }
         }
 
         #endregion
+
+
     }
 
 }
