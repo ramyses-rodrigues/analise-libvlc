@@ -1,7 +1,7 @@
 # analise-libvlc
 Projeto criado para trabalhos com transcrição e análise de conteúdo de materiais audiovisuais
 Necessário instalar VideoLAN.LibVLCSharp (https://github.com/videolan/libvlcsharp) no Visual Studio via NuGet.
-Também será necessário incluir nas dependências de projeto a biblioteca LibVLCSharp.dll
+Também será necessário incluir nas dependências de projeto a biblioteca LibVLCSharp.dll, localizada no mesmo diretório do executável
 A compilação automaticamente gerará a pasta LibVLC no diretório de saída, contendo os binários (.dll) do VLC.
 <p>Funções:</p>
 Playlist: Botão esquerdo seleciona e reproduz / botão direito apaga item da playlist
