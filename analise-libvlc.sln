@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "analise-libvlc", "analise-l
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VLC_Media_Player_2", "..\VLC_Media_Player_2\VLC_Media_Player_2.csproj", "{3D36F7AC-E23E-4240-A572-303CF9655AFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibVLCSharp", "..\..\LibVLCSharp-Git-clone\src\LibVLCSharp\LibVLCSharp.csproj", "{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibVLCSharp", "..\..\LibVLCSharp\src\LibVLCSharp\LibVLCSharp.csproj", "{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,14 +33,14 @@ Global
 		{3D36F7AC-E23E-4240-A572-303CF9655AFB}.Win32Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D36F7AC-E23E-4240-A572-303CF9655AFB}.Win32Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D36F7AC-E23E-4240-A572-303CF9655AFB}.Win32Release|Any CPU.Build.0 = Release|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Debug|Any CPU.ActiveCfg = Win32Debug|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Debug|Any CPU.Build.0 = Win32Debug|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Release|Any CPU.ActiveCfg = Win32Release|Any CPU
-		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Release|Any CPU.Build.0 = Win32Release|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Win32Debug|Any CPU.ActiveCfg = Win32Debug|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Win32Debug|Any CPU.Build.0 = Win32Debug|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Win32Release|Any CPU.ActiveCfg = Win32Release|Any CPU
+		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Win32Release|Any CPU.Build.0 = Win32Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
