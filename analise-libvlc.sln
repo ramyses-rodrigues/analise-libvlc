@@ -5,7 +5,9 @@ VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "analise-libvlc", "analise-libvlc.csproj", "{9422A943-2C99-4559-AFF3-1C8945BA7847}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VLC_Media_Player_2", "..\VLC_Media_Player_2\VLC_Media_Player_2.csproj", "{3D36F7AC-E23E-4240-A572-303CF9655AFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VLC_Media_Player_2", "..\VLC_Media_Player_2\VLC_Media_Player_2.csproj", "{3D36F7AC-E23E-4240-A572-303CF9655AFB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibVLCSharp", "..\..\LibVLCSharp-Git-clone\src\LibVLCSharp\LibVLCSharp.csproj", "{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{3D36F7AC-E23E-4240-A572-303CF9655AFB}.Win32Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D36F7AC-E23E-4240-A572-303CF9655AFB}.Win32Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D36F7AC-E23E-4240-A572-303CF9655AFB}.Win32Release|Any CPU.Build.0 = Release|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Debug|Any CPU.ActiveCfg = Win32Debug|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Debug|Any CPU.Build.0 = Win32Debug|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Release|Any CPU.ActiveCfg = Win32Release|Any CPU
+		{D4CEE9CA-37C7-45CA-9FD7-0556D74E917F}.Win32Release|Any CPU.Build.0 = Win32Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
