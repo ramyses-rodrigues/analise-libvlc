@@ -6,13 +6,14 @@ using System.Linq;
 using System.Windows.Forms;
 using LibVLCSharp.Shared;
 
+
 namespace analise_libvlc
 {
     public partial class Form2 : Form
     {
 
         #region variáveis globais
-        private LibVLC _libVLC;
+        private readonly LibVLC _libVLC;
         private MediaPlayer _mp;
         private Timer _aTimer;
         private List<String> _playlist;
@@ -277,7 +278,8 @@ namespace analise_libvlc
 
             try
             {
-                var media = new Media(_libVLC, new Uri(filePath));
+                //var media = new Media(_libVLC, new Uri(filePath));
+                var media = new Media(_libVLC, filePath, FromType.FromPath);
 
                 // se tiver stream de vídeo cria outra janela? mas com foco no richtext
                 //_mp.Hwnd = base.Handle; // handle do form principal. TO DO: Criar outra janela
@@ -294,8 +296,9 @@ namespace analise_libvlc
             // atualiza playlist            
             AtualizatsPlaylist();
             if (!rtTextBox.Focused) rtTextBox.Focus(); // não está funcionando para vídeo!
+            
         }
-
+               
         private void PlayPause(object sender, EventArgs e)
         {
             // houve necessidade de implementar com os argumentos sender e "e" porque essa função foi ligada
@@ -795,6 +798,42 @@ namespace analise_libvlc
 
         #endregion
 
+        #region experimental
+
+        /*
+         * para acessar os comandos disponíveis, digitar no cmd? vlc –-help  
+         */
+        private void extractToWav(string sourcefile) // experimental
+        {
+            string destinationfile = Path.GetDirectoryName(sourcefile);
+
+            _libVLC.Log += (send, m) => Console.WriteLine($"[{m.Level}] {m.Module}:{m.Message}");
+
+            Media media = new Media(_libVLC, sourcefile, FromType.FromPath);
+
+            media.AddOption(":no-sout-video");
+            media.AddOption(":sout-audio");
+            media.AddOption(":sout-keep");
+            media.AddOption(":sout=#transcode{acodec=s16l,ab=128,channels=1,samplerate=24000}:" +
+                            "std{access=file,mux=wav,dst=" + sourcefile +
+                            ".wav" + "}");
+
+            MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
+
+            mPlayer.Play(media);
+            media.Dispose();
+        }
+
+        private byte[] getThumbnail(Media media, int i_width, int i_height) // experimental
+        {
+            media.AddOption(":no-audio");
+            media.AddOption(":no-spu");
+            media.AddOption(":no-osd");
+            media.AddOption(":input-fast-seek");
+
+            return getThumbnail(media, i_width, i_height);
+        }
+        #endregion
 
     }
 

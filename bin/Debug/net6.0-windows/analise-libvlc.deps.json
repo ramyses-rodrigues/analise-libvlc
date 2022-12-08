@@ -9,7 +9,7 @@
       "analise-libvlc/1.0.0": {
         "dependencies": {
           "LibVLCSharp": "3.6.7",
-          "VideoLAN.LibVLC.Windows": "3.0.17.4"
+          "VideoLAN.LibVLC.Windows": "3.0.18"
         },
         "runtime": {
           "analise-libvlc.dll": {}
@@ -23,7 +23,7 @@
           }
         }
       },
-      "VideoLAN.LibVLC.Windows/3.0.17.4": {}
+      "VideoLAN.LibVLC.Windows/3.0.18": {}
     }
   },
   "libraries": {
@@ -39,12 +39,12 @@
       "path": "libvlcsharp/3.6.7",
       "hashPath": "libvlcsharp.3.6.7.nupkg.sha512"
     },
-    "VideoLAN.LibVLC.Windows/3.0.17.4": {
+    "VideoLAN.LibVLC.Windows/3.0.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-oCvlMgF69X5J7ZcIM+DUcOiRDFTrOcZwhnaMkjGAB+PwtKqd0IaqcKcb6+oo11GfJyWjyPO/FXrXzE+Y/htmeg==",
-      "path": "videolan.libvlc.windows/3.0.17.4",
-      "hashPath": "videolan.libvlc.windows.3.0.17.4.nupkg.sha512"
+      "sha512": "sha512-A7Fg86aSziadDxB4F8AWN6kHNgEYJqerdPG9SflPM0GDO9m/O2jnc60mfSa52xOh5EC4U62W0y4kdyw+FgB2iQ==",
+      "path": "videolan.libvlc.windows/3.0.18",
+      "hashPath": "videolan.libvlc.windows.3.0.18.nupkg.sha512"
     }
   }
 }
