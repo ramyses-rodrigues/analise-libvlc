@@ -25,3 +25,7 @@ Playlist: Botão esquerdo seleciona e reproduz / botão direito apaga item da pl
 <p>PAGEDOWN: Retroceder de step milisegundos </p>
 <p>CTRL + SETA esq: Retroceder de step milisegundos </p>
 <p>CTRL + SETA dir: Avançar de step milisegundos </p>
+
+Em implementação:
+<p>SHIFT + SETA esq: Selecionar trecho (intervalo de tempo) para trás </p>
+<p>SHIFT + SETA dir: Selecionar trecho (intervalo de tempo) para frente </p>
