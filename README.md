@@ -9,14 +9,14 @@ A compilação automaticamente gerará a pasta LibVLC no diretório de saída, c
 Playlist: Botão esquerdo seleciona e reproduz / botão direito apaga item da playlist
 <p>Teclado: </p>
 <p>ESC: Parar </p>
-<p>F1: Play/Pausa com retorno de step milisegundos </p>
-<p>F2: Play/Pausa </p>
+<p>F1: Reprodução/Pausa com retorno de step milisegundos ou Reproduz seleção </p>
+<p>F2: Reprodução/Pausa </p>
 <p>F3:  </p>
 <p>F4:  </p>
 <p>F5:  </p>
 <p>F6: Inserir snapshot do vídeo no texto </p>
 <p>F7: Inserir instante de tempo atual no texto </p>
-<p>F8: Ir para instante de tempo sob o cursor do mouse </p>
+<p>F8: Ir para instante de tempo (ou seleção)  na linha sob o cursor do texto </p>
 <p>F9:  </p>
 <p>F10: </p>
 <p>F11: </p>
@@ -25,3 +25,7 @@ Playlist: Botão esquerdo seleciona e reproduz / botão direito apaga item da pl
 <p>PAGEDOWN: Retroceder de step milisegundos </p>
 <p>CTRL + SETA esq: Retroceder de step milisegundos </p>
 <p>CTRL + SETA dir: Avançar de step milisegundos </p>
+
+Em implementação:
+<p>SHIFT + SETA esq: Selecionar trecho (intervalo de tempo) para trás </p>
+<p>SHIFT + SETA dir: Selecionar trecho (intervalo de tempo) para frente </p>
