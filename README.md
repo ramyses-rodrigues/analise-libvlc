@@ -3,6 +3,7 @@ Projeto criado para trabalhos com transcrição e análise de conteúdo de mater
 <p>Necessário instalar no Visual Studio, via Nuget: </p>
 <p>1) LibVCLSharp (https://github.com/videolan/libvlcsharp)</p>
 <p>2) VideoLAN.LibVLCSharp.Windows </p>
+<p> Em implementação: instalar FFMPEG.net</p>
 <p><p>
 A compilação automaticamente gerará a pasta LibVLC no diretório de saída, contendo os binários (.dll) do VLC.
 <p>Funções:</p>
@@ -29,3 +30,4 @@ Playlist: Botão esquerdo seleciona e reproduz / botão direito apaga item da pl
 Em implementação:
 <p>SHIFT + SETA esq: Selecionar trecho (intervalo de tempo) para trás </p>
 <p>SHIFT + SETA dir: Selecionar trecho (intervalo de tempo) para frente </p>
+<p> Funções do FFMPEG: conversão de formato; extração de streams; captura de frames, etc </p>
