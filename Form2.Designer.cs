@@ -67,7 +67,7 @@
             this.guiaDeTeclasDeAtalhoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.statusStrip2 = new System.Windows.Forms.StatusStrip();
-            this.statusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.labelStatus1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.progressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.novaToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -387,7 +387,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 28);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(800, 150);
+            this.panel1.Size = new System.Drawing.Size(800, 93);
             this.panel1.TabIndex = 3;
             // 
             // statusStrip2
@@ -395,7 +395,7 @@
             this.statusStrip2.Dock = System.Windows.Forms.DockStyle.Top;
             this.statusStrip2.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusLabel1,
+            this.labelStatus1,
             this.progressBar1});
             this.statusStrip2.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.statusStrip2.Location = new System.Drawing.Point(0, 28);
@@ -406,9 +406,9 @@
             // 
             // statusLabel1
             // 
-            this.statusLabel1.Name = "statusLabel1";
-            this.statusLabel1.Size = new System.Drawing.Size(797, 20);
-            this.statusLabel1.Text = "Ir para posição:      ";
+            this.labelStatus1.Name = "statusLabel1";
+            this.labelStatus1.Size = new System.Drawing.Size(797, 20);
+            this.labelStatus1.Text = "Ir para posição:      ";
             // 
             // progressBar1
             // 
@@ -649,9 +649,9 @@
             // 
             this.rtTextBox.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.rtTextBox.EnableAutoDragDrop = true;
-            this.rtTextBox.Location = new System.Drawing.Point(0, 260);
+            this.rtTextBox.Location = new System.Drawing.Point(0, 138);
             this.rtTextBox.Name = "rtTextBox";
-            this.rtTextBox.Size = new System.Drawing.Size(800, 454);
+            this.rtTextBox.Size = new System.Drawing.Size(800, 576);
             this.rtTextBox.TabIndex = 4;
             this.rtTextBox.Text = "";
             // 
@@ -743,7 +743,7 @@
         private System.Windows.Forms.ToolStripMenuItem guiaDeTeclasDeAtalhoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extrairWAVToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip2;
-        private System.Windows.Forms.ToolStripStatusLabel statusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel labelStatus1;
         private System.Windows.Forms.ToolStripProgressBar progressBar1;
     }
 }

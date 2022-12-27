@@ -5,10 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using LibVLCSharp.Shared;
-using Microsoft.VisualBasic;
-using System.Diagnostics;
-using static System.Windows.Forms.AxHost;
-using System.Drawing.Text;
+
 
 namespace analise_libvlc
 {
@@ -358,34 +355,78 @@ namespace analise_libvlc
                                 Path.GetFileNameWithoutExtension(_path) +
                                 "-" + time.ToString() + ".png";
 
+            Media media = new Media(_libVLC, _path, FromType.FromPath);
+            
+            media.AddOption(":video-filter=scene");
+            media.AddOption(":scene-format=png");
+            media.AddOption(":vout=dummy");
+            //media.AddOption("--start-time=" + time.ToString());
+            //media.AddOption("--stop-time=" + time.ToString());
+            media.AddOption(":scene-ratio=100");
+            media.AddOption(":scene-path=" + Path.GetDirectoryName(image_path));
+            MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
+            if (mPlayer.Play(media))
+                MessageBox.Show("Arquivo PNG salvo em: " + image_path); // salva arquivo WAV na mesma pasta da origem
+            media.Dispose();
+
+            //--scene-format= < string > Image format
+            //   Format of the output images(png, jpeg, ...).
+            //--scene-width= < integer > Image width
+            //    You can enforce the image width.By default(- 1) VLC will adapt to
+            //    the video characteristics.
+            //--scene-height= < integer > Image height
+            //    You can enforce the image height.By default(- 1) VLC will adapt to
+            //    the video characteristics.
+            //--scene-prefix= < string > Filename prefix
+            //    Prefix of the output images filenames.Output filenames will have the
+            //    "prefixNUMBER.format" form if replace is not true.
+            //--scene-path= < string > Directory path prefix
+            //    Directory path where images files should be saved. If not set, then
+            //    images will be automatically saved in users homedir.
+            //--scene-replace, --no-scene-replace
+            //                           Always write to the same file
+            //                           (default disabled)
+            //    Always write to the same file instead of creating one file per image.
+            //    In this case, the number is not appended to the filename.
+            //--scene-ratio =< integer[1..2147483647] >
+            //                           Recording ratio
+            //    Ratio of images to record. 3 means that one image out of three is
+            //    recorded.
+
             // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
-            if (_mp.TakeSnapshot(0, image_path, w, h))
-            {
-                // pega novamente o arquivo e coloca na clipboard?
-                Image img = Image.FromFile(image_path);
-                Clipboard.SetImage(img);
-                if (rtTextBox.Focused) rtTextBox.Paste();
+            //if (_mp.TakeSnapshot(0, image_path, w, h))
+            //{
+            //    // pega novamente o arquivo e coloca na clipboard?
+            //    if (SourceFileNotOK(image_path)) return;
 
-                MessageBox.Show("Arquivo " + Path.GetFileNameWithoutExtension(_path)
-                    + " salvo com sucesso na pasta " + Path.GetDirectoryName(_path));
-            }
+            //    Image img = Image.FromFile(image_path);
+            //    Clipboard.SetImage(img);
+            //    if (rtTextBox.Focused) rtTextBox.Paste();
+
+            //    MessageBox.Show("Arquivo " + Path.GetFileNameWithoutExtension(image_path)
+            //    + " salvo com sucesso na pasta " + Path.GetDirectoryName(image_path));
+            //}
+
+
+
+            /* "pathtovideo" --video - filter = scene--vout = dummy--start - time = 300--stop - time = 600--scene - ratio = 250--scene - path = "pathtosaveimages" vlc://quit
+             * 
+             * 
+             
+            */
         }
-
         private bool MediaPlayerNotOK()
         {
             return ((_mp == null) || (_mp.Media == null));
         }
-
         private bool SourceFileNotOK(string sourcefile)
         {
-            return !File.Exists(sourcefile);
+            return !System.IO.File.Exists(sourcefile);
         }
 
         private void extractToWav(string sourcefile) // experimental
         {
-
             if (SourceFileNotOK(sourcefile)) return;
-
             string destinationfile = Path.GetDirectoryName(sourcefile);
             destinationfile += "\\" + Path.GetFileNameWithoutExtension(sourcefile);
 
@@ -443,7 +484,7 @@ namespace analise_libvlc
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    filePath = openFileDialog.FileName; 
+                    filePath = openFileDialog.FileName;
                     extractToWav(filePath); // extrai a stream de áudio para WAV 
                 }
             }
@@ -552,7 +593,7 @@ namespace analise_libvlc
 
             // converte para formato de hh:min:seg
             TimeSpan ts = TimeSpan.FromMilliseconds(iPos > 0 & iPos < _mp.Length ? iPos : 0);
-            statusLabel1.Text = "Ir para posição: " + ts.ToString(@"hh\:mm\:ss");
+            labelStatus1.Text = "Ir para posição: " + ts.ToString(@"hh\:mm\:ss");
         }
 
 
@@ -571,7 +612,7 @@ namespace analise_libvlc
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     filePath = openFileDialog.FileName;
-                    if (File.Exists(filePath))
+                    if (!SourceFileNotOK(filePath))
                         rtTextBox.LoadFile(filePath);
                 }
             }
@@ -627,6 +668,7 @@ namespace analise_libvlc
         private void UpdateCaptionAndProgressBarDelegateMethod(string message, int val) // Cria método para o delegate declarado.
         {
             this.Text = message; // atualiza caption do Form
+            if (!_mouseInProgressBar) labelStatus1.Text = message;
             progressBar1.Value = val; // atualiza barra de progresso
         }
 
