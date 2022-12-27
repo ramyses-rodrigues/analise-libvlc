@@ -57,6 +57,7 @@
             this.ferramentasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.personalizarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.opçõesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extrairWAVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ajudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sumárioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.índiceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,6 +66,9 @@
             this.sobreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.guiaDeTeclasDeAtalhoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.statusStrip2 = new System.Windows.Forms.StatusStrip();
+            this.statusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.progressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.novaToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.abrirToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -92,14 +96,10 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.rtTextBox = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.statusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.progressBar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.extrairWAVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.statusStrip2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -249,20 +249,20 @@
             // 
             this.desfazerToolStripMenuItem.Name = "desfazerToolStripMenuItem";
             this.desfazerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.desfazerToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.desfazerToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.desfazerToolStripMenuItem.Text = "&Desfazer";
             // 
             // refazerToolStripMenuItem
             // 
             this.refazerToolStripMenuItem.Name = "refazerToolStripMenuItem";
             this.refazerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.refazerToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.refazerToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.refazerToolStripMenuItem.Text = "&Refazer";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(221, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(198, 6);
             // 
             // recortarToolStripMenuItem
             // 
@@ -270,7 +270,7 @@
             this.recortarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.recortarToolStripMenuItem.Name = "recortarToolStripMenuItem";
             this.recortarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.recortarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.recortarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.recortarToolStripMenuItem.Text = "Recor&tar";
             // 
             // copiarToolStripMenuItem
@@ -279,7 +279,7 @@
             this.copiarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.copiarToolStripMenuItem.Name = "copiarToolStripMenuItem";
             this.copiarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.copiarToolStripMenuItem.Text = "&Copiar";
             // 
             // colarToolStripMenuItem
@@ -288,18 +288,18 @@
             this.colarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.colarToolStripMenuItem.Name = "colarToolStripMenuItem";
             this.colarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.colarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.colarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.colarToolStripMenuItem.Text = "&Colar";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(221, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(198, 6);
             // 
             // selecionarTudoToolStripMenuItem
             // 
             this.selecionarTudoToolStripMenuItem.Name = "selecionarTudoToolStripMenuItem";
-            this.selecionarTudoToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.selecionarTudoToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
             this.selecionarTudoToolStripMenuItem.Text = "Selecionar &Tudo";
             // 
             // ferramentasToolStripMenuItem
@@ -315,14 +315,21 @@
             // personalizarToolStripMenuItem
             // 
             this.personalizarToolStripMenuItem.Name = "personalizarToolStripMenuItem";
-            this.personalizarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.personalizarToolStripMenuItem.Size = new System.Drawing.Size(171, 26);
             this.personalizarToolStripMenuItem.Text = "&Personalizar";
             // 
             // opçõesToolStripMenuItem
             // 
             this.opçõesToolStripMenuItem.Name = "opçõesToolStripMenuItem";
-            this.opçõesToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.opçõesToolStripMenuItem.Size = new System.Drawing.Size(171, 26);
             this.opçõesToolStripMenuItem.Text = "&Opções";
+            // 
+            // extrairWAVToolStripMenuItem
+            // 
+            this.extrairWAVToolStripMenuItem.Name = "extrairWAVToolStripMenuItem";
+            this.extrairWAVToolStripMenuItem.Size = new System.Drawing.Size(171, 26);
+            this.extrairWAVToolStripMenuItem.Text = "Extrair WAV";
+            this.extrairWAVToolStripMenuItem.Click += new System.EventHandler(this.extrairWAVToolStripMenuItem_Click);
             // 
             // ajudaToolStripMenuItem
             // 
@@ -375,12 +382,44 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.statusStrip2);
             this.panel1.Controls.Add(this.toolStrip1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 28);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(800, 102);
+            this.panel1.Size = new System.Drawing.Size(800, 150);
             this.panel1.TabIndex = 3;
+            // 
+            // statusStrip2
+            // 
+            this.statusStrip2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.statusStrip2.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusLabel1,
+            this.progressBar1});
+            this.statusStrip2.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
+            this.statusStrip2.Location = new System.Drawing.Point(0, 28);
+            this.statusStrip2.Name = "statusStrip2";
+            this.statusStrip2.Size = new System.Drawing.Size(800, 103);
+            this.statusStrip2.TabIndex = 6;
+            this.statusStrip2.Text = "statusStrip2";
+            // 
+            // statusLabel1
+            // 
+            this.statusLabel1.Name = "statusLabel1";
+            this.statusLabel1.Size = new System.Drawing.Size(797, 20);
+            this.statusLabel1.Text = "Ir para posição:      ";
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(795, 18);
+            this.progressBar1.Step = 1;
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
+            this.progressBar1.MouseEnter += new System.EventHandler(this.progressBar1_MouseEnter);
+            this.progressBar1.MouseLeave += new System.EventHandler(this.progressBar1_MouseLeave);
+            this.progressBar1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.progressBar1_MouseMove);
             // 
             // toolStrip1
             // 
@@ -507,12 +546,14 @@
             this.tsPlaylist.Name = "tsPlaylist";
             this.tsPlaylist.Size = new System.Drawing.Size(69, 25);
             this.tsPlaylist.Text = "Playlist";
+            this.tsPlaylist.ToolTipText = "\"Lista de reprodução para acesso rápido\"";
             // 
             // cbStepList
             // 
             this.cbStepList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbStepList.Name = "cbStepList";
             this.cbStepList.Size = new System.Drawing.Size(121, 28);
+            this.cbStepList.ToolTipText = "Define passo do player";
             // 
             // tsRate
             // 
@@ -526,6 +567,7 @@
             this.tsRate.Name = "tsRate";
             this.tsRate.Size = new System.Drawing.Size(97, 25);
             this.tsRate.Text = "Velocidade";
+            this.tsRate.ToolTipText = "Define velocidade do player";
             // 
             // toolStripMenuItem1
             // 
@@ -607,52 +649,17 @@
             // 
             this.rtTextBox.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.rtTextBox.EnableAutoDragDrop = true;
-            this.rtTextBox.Location = new System.Drawing.Point(0, 179);
+            this.rtTextBox.Location = new System.Drawing.Point(0, 260);
             this.rtTextBox.Name = "rtTextBox";
-            this.rtTextBox.Size = new System.Drawing.Size(800, 535);
+            this.rtTextBox.Size = new System.Drawing.Size(800, 454);
             this.rtTextBox.TabIndex = 4;
             this.rtTextBox.Text = "";
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusLabel1,
-            this.progressBar1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 153);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(800, 26);
-            this.statusStrip1.TabIndex = 5;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // statusLabel1
-            // 
-            this.statusLabel1.Name = "statusLabel1";
-            this.statusLabel1.Size = new System.Drawing.Size(135, 20);
-            this.statusLabel1.Text = "Ir para posição:      ";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(600, 18);
-            this.progressBar1.Step = 1;
-            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
-            this.progressBar1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.progressBar1_MouseMove);
-            // 
-            // extrairWAVToolStripMenuItem
-            // 
-            this.extrairWAVToolStripMenuItem.Name = "extrairWAVToolStripMenuItem";
-            this.extrairWAVToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            this.extrairWAVToolStripMenuItem.Text = "Extrair WAV";
-            this.extrairWAVToolStripMenuItem.Click += new System.EventHandler(this.extrairWAVToolStripMenuItem_Click);
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 714);
-            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.rtTextBox);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
@@ -662,10 +669,10 @@
             this.menuStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.statusStrip2.ResumeLayout(false);
+            this.statusStrip2.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -709,9 +716,6 @@
         private System.Windows.Forms.ToolStripMenuItem informaçõesDaMídiaToolStripMenuItem;
         private System.Windows.Forms.RichTextBox rtTextBox;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel statusLabel1;
-        private System.Windows.Forms.ToolStripProgressBar progressBar1;
         private System.Windows.Forms.ToolStripMenuItem carregarTextoToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton novaToolStripButton;
@@ -738,5 +742,8 @@
         private System.Windows.Forms.ToolStripButton toolStripButForward;
         private System.Windows.Forms.ToolStripMenuItem guiaDeTeclasDeAtalhoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extrairWAVToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusStrip2;
+        private System.Windows.Forms.ToolStripStatusLabel statusLabel1;
+        private System.Windows.Forms.ToolStripProgressBar progressBar1;
     }
 }

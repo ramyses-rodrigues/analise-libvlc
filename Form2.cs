@@ -7,6 +7,8 @@ using System.Windows.Forms;
 using LibVLCSharp.Shared;
 using Microsoft.VisualBasic;
 using System.Diagnostics;
+using static System.Windows.Forms.AxHost;
+using System.Drawing.Text;
 
 namespace analise_libvlc
 {
@@ -21,6 +23,7 @@ namespace analise_libvlc
         private ContextMenuStrip _playlistContextMenuStrip; // 
         private int _step = 3000; // passo do player
         private long[] _interval = new long[2] { 0, 0 }; // armazenar trecho selecionado
+        private bool _mouseInProgressBar = false;
 
         #endregion
 
@@ -52,7 +55,7 @@ namespace analise_libvlc
             _mp.TimeChanged += new EventHandler<MediaPlayerTimeChangedEventArgs>(On_MediaPlayerTimerChanged);
             _mp.Forward += new EventHandler<EventArgs>(On_MediaPlayerForward);
             _mp.Backward += new EventHandler<EventArgs>(On_MediaPlayerBackward);
-
+            _mp.PositionChanged += new EventHandler<MediaPlayerPositionChangedEventArgs>(On_PositionChanged);
 
             // cria um timer para exibição de instante de tempo e outras funções para o usuário.
             _aTimer = new Timer();
@@ -191,7 +194,7 @@ namespace analise_libvlc
 
             // extrai valor em milisegundos da linha
             var iTime = sLine.Substring(startIndex, endIndex - startIndex);
-            
+
             _mp.Time = Convert.ToInt64(iTime); // posiciona a mídia no instante desejado
 
         }
@@ -250,12 +253,14 @@ namespace analise_libvlc
 
             // atualiza itens na tsPlayList (tsPlaylist é o componente do Form)
             tsPlaylist.DropDownItems.Clear();
+            tsPlaylist.ToolTipText = "Lista de reprodução para acesso rápido";
             foreach (var item in _playlist)
             {
                 int idx = _playlist.IndexOf(item);
                 tsPlaylist.DropDownItems.Add(_playlist[idx]);
                 tsPlaylist.DropDownItems[idx].MouseUp += new MouseEventHandler(ToolStripMenuItemClick); // associa handler para click
-                
+                tsPlaylist.DropDownItems[idx].ToolTipText = "Para deletar clique com botão direito do mouse";
+
                 if (new Uri(_mp.Media.Mrl) == new Uri(tsPlaylist.DropDownItems[idx].Text))
                     ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
             }
@@ -263,12 +268,6 @@ namespace analise_libvlc
 
         private void OpenMediaFile(String filePath) // abre para reprodução de UM arquivo de mídia
         {
-            if (SourceFileNotOK(filePath))
-            {
-                MessageBox.Show("Arquivo não encontrado! ");
-                return;
-            }
-
             try
             {
                 //var media = new Media(_libVLC, new Uri(filePath));
@@ -372,61 +371,41 @@ namespace analise_libvlc
             }
         }
 
-        private int CalcProgressBarRelativeMouse(object sender, EventArgs e)
-        {
-            // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
-            float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
-            // Calculate the factor for converting the position (progbarWidth/100) //
-            float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
-            // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
-            float relativeMouse = absoluteMouse / calcFactor;
-
-            return Convert.ToInt32(relativeMouse);
-        }
-
         private bool MediaPlayerNotOK()
-        {            
+        {
             return ((_mp == null) || (_mp.Media == null));
         }
 
         private bool SourceFileNotOK(string sourcefile)
         {
-            return !File.Exists(sourcefile);            
+            return !File.Exists(sourcefile);
         }
-        
-        private void extractToWav() // experimental
+
+        private void extractToWav(string sourcefile) // experimental
         {
-            var filePath = String.Empty;
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Multiselect = false;
-                openFileDialog.Filter = "All files (*.*)|*.*";
-                openFileDialog.RestoreDirectory = true;
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    filePath = openFileDialog.FileName;
-                    string destinationfile = Path.GetDirectoryName(filePath);
-                    destinationfile += "\\" + Path.GetFileNameWithoutExtension(filePath);
+            if (SourceFileNotOK(sourcefile)) return;
 
-                    _libVLC.Log += (send, m) => Console.WriteLine($"[{m.Level}] {m.Module}:{m.Message}");
+            string destinationfile = Path.GetDirectoryName(sourcefile);
+            destinationfile += "\\" + Path.GetFileNameWithoutExtension(sourcefile);
 
-                    Media media = new Media(_libVLC, filePath, FromType.FromPath);
+            _libVLC.Log += (send, m) => Console.WriteLine($"[{m.Level}] {m.Module}:{m.Message}");
 
-                    media.AddOption(":no-sout-video");
-                    media.AddOption(":sout-audio");
-                    media.AddOption(":sout-keep");
-                    media.AddOption(":sout=#transcode{acodec=s16l,ab=128,channels=1,samplerate=24000}:" +
-                                    "std{access=file,mux=wav,dst=" + destinationfile + ".wav" + "}");
+            Media media = new Media(_libVLC, sourcefile, FromType.FromPath);
 
-                    MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
+            media.AddOption(":no-sout-video");
+            media.AddOption(":sout-audio");
+            media.AddOption(":sout-keep");
+            media.AddOption(":sout=#transcode{acodec=s16l,ab=128,channels=1,samplerate=24000}:" +
+                            "std{access=file,mux=wav,dst=" + destinationfile + ".wav" + "}");
 
-                    mPlayer.Play(media); // salva arquivo WAV na mesma pasta da origem
-                    media.Dispose();
+            MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
 
-                    MessageBox.Show("Arquivo WAV salvo em: " + destinationfile + ".wav");
-                }
-            }
+            mPlayer.Play(media); // salva arquivo WAV na mesma pasta da origem
+            media.Dispose();
+
+            MessageBox.Show("Arquivo WAV salvo em: " + destinationfile + ".wav");
+
         }
 
         #endregion
@@ -455,7 +434,19 @@ namespace analise_libvlc
 
         private void extrairWAVToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            extractToWav(); // abre uma janela e extrai a stream de áudio para WAV            
+            var filePath = String.Empty;
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Multiselect = false;
+                openFileDialog.Filter = "All files (*.*)|*.*";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    filePath = openFileDialog.FileName; 
+                    extractToWav(filePath); // extrai a stream de áudio para WAV 
+                }
+            }
         }
 
         private void abrirURLToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -522,8 +513,19 @@ namespace analise_libvlc
         private void progressBar1_Click(object sender, EventArgs e)
         {
             if (MediaPlayerNotOK()) return;
+            int CalcProgressBarRelativeMouse(object sender)
+            {
+                // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
+                float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
+                // Calculate the factor for converting the position (progbarWidth/100) //
+                float calcFactor = (sender as ToolStripProgressBar).Width / (float)(sender as ToolStripProgressBar).Maximum;
+                // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
+                float relativeMouse = absoluteMouse / calcFactor;
 
-            int pos = CalcProgressBarRelativeMouse(sender, e); // retorna um inteiro [0:100] com a posição relativa do mouse sobre a barra
+                return Convert.ToInt32(relativeMouse);
+            }
+
+            int pos = CalcProgressBarRelativeMouse(sender); // retorna um inteiro [0:100] com a posição relativa do mouse sobre a barra
             if (pos >= 0)
                 _mp.Position = (float)pos / 100;
         }
@@ -532,14 +534,27 @@ namespace analise_libvlc
         {
             if (MediaPlayerNotOK()) return;
 
+            int CalcProgressBarRelativeMouse(object sender)
+            {
+                // Get mouse position(x) minus the width of the progressbar (so beginning of the progressbar is mousepos = 0 //
+                float absoluteMouse = (PointToClient(MousePosition).X - (sender as ToolStripProgressBar).Bounds.X);
+                // Calculate the factor for converting the position (progbarWidth/100) //
+                float calcFactor = (float)(sender as ToolStripProgressBar).Width / (sender as ToolStripProgressBar).Maximum;
+                // In the end convert the absolute mouse value to a relative mouse value by dividing the absolute mouse by the calcfactor //
+                float relativeMouse = absoluteMouse / calcFactor;
+
+                return Convert.ToInt32(relativeMouse);
+            }
+
             // retorna um inteiro [0:100] com a posição relativa do mouse sobre a progressbar
-            int pos = CalcProgressBarRelativeMouse(sender, e);
+            int pos = CalcProgressBarRelativeMouse(sender);
             var iPos = (pos * _mp.Length / 100);
 
             // converte para formato de hh:min:seg
             TimeSpan ts = TimeSpan.FromMilliseconds(iPos > 0 & iPos < _mp.Length ? iPos : 0);
             statusLabel1.Text = "Ir para posição: " + ts.ToString(@"hh\:mm\:ss");
         }
+
 
         private void carregarTextoToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -605,6 +620,18 @@ namespace analise_libvlc
 
         private void On_TimerTick(object sender, EventArgs e)
         {
+            //
+        }
+
+        delegate void OnMediaPlayerPositionChangedDelegate(String txt, int val);
+        private void UpdateCaptionAndProgressBarDelegateMethod(string message, int val) // Cria método para o delegate declarado.
+        {
+            this.Text = message; // atualiza caption do Form
+            progressBar1.Value = val; // atualiza barra de progresso
+        }
+
+        private void On_PositionChanged(object sender, EventArgs e)
+        {
             if (MediaPlayerNotOK()) return;
 
             var pos = _mp.Position; // obtém a posição da stream em percentual
@@ -620,15 +647,18 @@ namespace analise_libvlc
             // atualiza progressbar
             int val = Convert.ToInt32(pos * 100);
             val = val >= 0 & val <= 100 ? val : 0;
-            progressBar1.Value = val;
+            //progressBar1.Value = val;
 
             // atualiza caption
-            this.Text = _state.ToString() + " @rate " + _rate.ToString() +
+            string text = _state.ToString() + " @rate " + _rate.ToString() +
                         " - " + ts.ToString(@"hh\:mm\:ss") +
                         " / " + tsTotal.ToString(@"hh\:mm\:ss");
+
+            // Atualiza caption do form principal e barra de progresso através de delegate (contorna problemas de thread).
+            this.BeginInvoke(new OnMediaPlayerPositionChangedDelegate(UpdateCaptionAndProgressBarDelegateMethod), text, val); // chama método assincronicamente
+
         }
 
-        public delegate void OnMediaPlayerTimerChangedDelegate(String txt, int v);
         private void On_MediaPlayerTimerChanged(object sender, MediaPlayerTimeChangedEventArgs e)
         {
             // corrigir problemas... funcionando com o componente Timer
@@ -644,6 +674,8 @@ namespace analise_libvlc
             //implementar ações
         }
 
+
+
         private void On_FormClosed(object sender, FormClosedEventArgs e)
         {
             _aTimer.Stop();
@@ -658,7 +690,7 @@ namespace analise_libvlc
             //_playlist.Add(fpath);
             //OpenMediaFile(fpath);
 
-            //openMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+            OpenMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
         }
 
         private void On_MouseWheel(object sender, MouseEventArgs e)
@@ -840,7 +872,7 @@ namespace analise_libvlc
         /*
          * para acessar os comandos disponíveis, digitar no cmd? vlc –-help  
          */
-        
+
         private byte[] getThumbnail(Media media, int i_width, int i_height) // experimental
         {
             media.AddOption(":no-audio");
@@ -850,7 +882,21 @@ namespace analise_libvlc
 
             return getThumbnail(media, i_width, i_height);
         }
+
+        // to do: atualizar o label dinamicamente. quando estiver sob a progressbar e quando estiver fora
+        private void progressBar1_MouseEnter(object sender, EventArgs e)
+        {
+            _mouseInProgressBar = true;
+        }
+
+        private void progressBar1_MouseLeave(object sender, EventArgs e)
+        {
+            _mouseInProgressBar = false;
+        }
+
         #endregion
+
+
     }
 
 }
