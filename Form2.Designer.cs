@@ -95,6 +95,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.progressBar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.extrairWAVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -248,20 +249,20 @@
             // 
             this.desfazerToolStripMenuItem.Name = "desfazerToolStripMenuItem";
             this.desfazerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.desfazerToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
+            this.desfazerToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.desfazerToolStripMenuItem.Text = "&Desfazer";
             // 
             // refazerToolStripMenuItem
             // 
             this.refazerToolStripMenuItem.Name = "refazerToolStripMenuItem";
             this.refazerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.refazerToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
+            this.refazerToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.refazerToolStripMenuItem.Text = "&Refazer";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(198, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(221, 6);
             // 
             // recortarToolStripMenuItem
             // 
@@ -269,7 +270,7 @@
             this.recortarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.recortarToolStripMenuItem.Name = "recortarToolStripMenuItem";
             this.recortarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.recortarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
+            this.recortarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.recortarToolStripMenuItem.Text = "Recor&tar";
             // 
             // copiarToolStripMenuItem
@@ -278,7 +279,7 @@
             this.copiarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.copiarToolStripMenuItem.Name = "copiarToolStripMenuItem";
             this.copiarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
+            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.copiarToolStripMenuItem.Text = "&Copiar";
             // 
             // colarToolStripMenuItem
@@ -287,25 +288,26 @@
             this.colarToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.colarToolStripMenuItem.Name = "colarToolStripMenuItem";
             this.colarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.colarToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
+            this.colarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.colarToolStripMenuItem.Text = "&Colar";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(198, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(221, 6);
             // 
             // selecionarTudoToolStripMenuItem
             // 
             this.selecionarTudoToolStripMenuItem.Name = "selecionarTudoToolStripMenuItem";
-            this.selecionarTudoToolStripMenuItem.Size = new System.Drawing.Size(201, 26);
+            this.selecionarTudoToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.selecionarTudoToolStripMenuItem.Text = "Selecionar &Tudo";
             // 
             // ferramentasToolStripMenuItem
             // 
             this.ferramentasToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.personalizarToolStripMenuItem,
-            this.opçõesToolStripMenuItem});
+            this.opçõesToolStripMenuItem,
+            this.extrairWAVToolStripMenuItem});
             this.ferramentasToolStripMenuItem.Name = "ferramentasToolStripMenuItem";
             this.ferramentasToolStripMenuItem.Size = new System.Drawing.Size(104, 24);
             this.ferramentasToolStripMenuItem.Text = "&Ferramentas";
@@ -313,13 +315,13 @@
             // personalizarToolStripMenuItem
             // 
             this.personalizarToolStripMenuItem.Name = "personalizarToolStripMenuItem";
-            this.personalizarToolStripMenuItem.Size = new System.Drawing.Size(171, 26);
+            this.personalizarToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.personalizarToolStripMenuItem.Text = "&Personalizar";
             // 
             // opçõesToolStripMenuItem
             // 
             this.opçõesToolStripMenuItem.Name = "opçõesToolStripMenuItem";
-            this.opçõesToolStripMenuItem.Size = new System.Drawing.Size(171, 26);
+            this.opçõesToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.opçõesToolStripMenuItem.Text = "&Opções";
             // 
             // ajudaToolStripMenuItem
@@ -638,6 +640,13 @@
             this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
             this.progressBar1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.progressBar1_MouseMove);
             // 
+            // extrairWAVToolStripMenuItem
+            // 
+            this.extrairWAVToolStripMenuItem.Name = "extrairWAVToolStripMenuItem";
+            this.extrairWAVToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.extrairWAVToolStripMenuItem.Text = "Extrair WAV";
+            this.extrairWAVToolStripMenuItem.Click += new System.EventHandler(this.extrairWAVToolStripMenuItem_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -728,5 +737,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButBackward;
         private System.Windows.Forms.ToolStripButton toolStripButForward;
         private System.Windows.Forms.ToolStripMenuItem guiaDeTeclasDeAtalhoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem extrairWAVToolStripMenuItem;
     }
 }

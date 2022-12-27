@@ -5,7 +5,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using LibVLCSharp.Shared;
-
+using Microsoft.VisualBasic;
+using System.Diagnostics;
 
 namespace analise_libvlc
 {
@@ -13,12 +14,13 @@ namespace analise_libvlc
     {
 
         #region variáveis globais
-        private readonly LibVLC _libVLC;
-        private MediaPlayer _mp;
-        private Timer _aTimer;
-        private List<String> _playlist;
-        private ContextMenuStrip _playlistContextMenuStrip;
-        private int _step = 3000;
+        private readonly LibVLC _libVLC; // engine
+        private MediaPlayer _mp; // mediaplayer
+        private Timer _aTimer; // timer
+        private List<String> _playlist; // armazena playlist
+        private ContextMenuStrip _playlistContextMenuStrip; // 
+        private int _step = 3000; // passo do player
+        private long[] _interval = new long[2] { 0, 0 }; // armazenar trecho selecionado
 
         #endregion
 
@@ -43,6 +45,7 @@ namespace analise_libvlc
             }
 
             // cria objeto Media Player e configura manipuladores de eventos
+            // Note: You may create multiple mediaplayers from a single LibVLC instance
             _mp = new MediaPlayer(_libVLC);
             _mp.EndReached += new EventHandler<EventArgs>(On_EndReached);
             _mp.Stopped += new EventHandler<EventArgs>(On_Stopped);
@@ -51,17 +54,16 @@ namespace analise_libvlc
             _mp.Backward += new EventHandler<EventArgs>(On_MediaPlayerBackward);
 
 
-            // cria um timer.
+            // cria um timer para exibição de instante de tempo e outras funções para o usuário.
             _aTimer = new Timer();
             _aTimer.Tick += new EventHandler(On_TimerTick);
             _aTimer.Interval = 300;
             _aTimer.Enabled = true;
 
-            // cria a playlist
+            // cria a playlist para armazenar os caminhos para cada arquivo de mídia a ser reproduzido
             _playlist = new List<string>(1);
 
-            // configura form
-
+            // configura form principal
             KeyPreview = true;  // permite responder a eventos de teclado
             AllowDrop = true;  // permite arrastar e soltar
 
@@ -189,10 +191,7 @@ namespace analise_libvlc
 
             // extrai valor em milisegundos da linha
             var iTime = sLine.Substring(startIndex, endIndex - startIndex);
-
-            // testes
-            //MessageBox.Show("Cursor na linha " + line.ToString() + ": " + iTime.ToString());
-
+            
             _mp.Time = Convert.ToInt64(iTime); // posiciona a mídia no instante desejado
 
         }
@@ -256,12 +255,7 @@ namespace analise_libvlc
                 int idx = _playlist.IndexOf(item);
                 tsPlaylist.DropDownItems.Add(_playlist[idx]);
                 tsPlaylist.DropDownItems[idx].MouseUp += new MouseEventHandler(ToolStripMenuItemClick); // associa handler para click
-
-                // verifica a mídia em reprodução atual para inserir marcação no item, se for o caso
-                //var list = new Uri(_mp.Media.Mrl); // transforma no formato uri para ser possível comparar
-                //var aUri = new Uri(tsPlaylist.DropDownItems[idx].Text);
-                //if (aUri == list) ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
-
+                
                 if (new Uri(_mp.Media.Mrl) == new Uri(tsPlaylist.DropDownItems[idx].Text))
                     ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
             }
@@ -269,8 +263,7 @@ namespace analise_libvlc
 
         private void OpenMediaFile(String filePath) // abre para reprodução de UM arquivo de mídia
         {
-            if ((filePath == null) || (filePath == String.Empty)) return;
-            if (!File.Exists(filePath))
+            if (SourceFileNotOK(filePath))
             {
                 MessageBox.Show("Arquivo não encontrado! ");
                 return;
@@ -296,9 +289,8 @@ namespace analise_libvlc
             // atualiza playlist            
             AtualizatsPlaylist();
             if (!rtTextBox.Focused) rtTextBox.Focus(); // não está funcionando para vídeo!
-            
         }
-               
+
         private void PlayPause(object sender, EventArgs e)
         {
             // houve necessidade de implementar com os argumentos sender e "e" porque essa função foi ligada
@@ -347,7 +339,8 @@ namespace analise_libvlc
         {
             // const char *image_path="/home/vinay/Documents/snap.png";
             // int result = libvlc_video_take_snapshot(mp, 0, image_path, 0, 0);
-            // parece que "file:" está atrapalhando...                       
+            // parece que "file:" está atrapalhando...
+            if (MediaPlayerNotOK()) return;
 
             //obtém dimensões informações sobre o frame
             var vtrackidx = _mp.VideoTrack; // obtém índice da stream do fluxo de vídeo
@@ -392,8 +385,48 @@ namespace analise_libvlc
         }
 
         private bool MediaPlayerNotOK()
-        {
+        {            
             return ((_mp == null) || (_mp.Media == null));
+        }
+
+        private bool SourceFileNotOK(string sourcefile)
+        {
+            return !File.Exists(sourcefile);            
+        }
+        
+        private void extractToWav() // experimental
+        {
+            var filePath = String.Empty;
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Multiselect = false;
+                openFileDialog.Filter = "All files (*.*)|*.*";
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    filePath = openFileDialog.FileName;
+                    string destinationfile = Path.GetDirectoryName(filePath);
+                    destinationfile += "\\" + Path.GetFileNameWithoutExtension(filePath);
+
+                    _libVLC.Log += (send, m) => Console.WriteLine($"[{m.Level}] {m.Module}:{m.Message}");
+
+                    Media media = new Media(_libVLC, filePath, FromType.FromPath);
+
+                    media.AddOption(":no-sout-video");
+                    media.AddOption(":sout-audio");
+                    media.AddOption(":sout-keep");
+                    media.AddOption(":sout=#transcode{acodec=s16l,ab=128,channels=1,samplerate=24000}:" +
+                                    "std{access=file,mux=wav,dst=" + destinationfile + ".wav" + "}");
+
+                    MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
+
+                    mPlayer.Play(media); // salva arquivo WAV na mesma pasta da origem
+                    media.Dispose();
+
+                    MessageBox.Show("Arquivo WAV salvo em: " + destinationfile + ".wav");
+                }
+            }
         }
 
         #endregion
@@ -416,9 +449,13 @@ namespace analise_libvlc
 
                     filePath = openFileDialog.FileName; // pega primeiro da lista selecionada e inicia a reprodução
                     OpenMediaFile(filePath); // reproduz a mídia e atualiza a playlist da janela
-                    //AtualizaPlaylist();
                 }
             }
+        }
+
+        private void extrairWAVToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            extractToWav(); // abre uma janela e extrai a stream de áudio para WAV            
         }
 
         private void abrirURLToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -555,7 +592,7 @@ namespace analise_libvlc
 
         #endregion
 
-        #region manipuladores de eventos de componentes
+        #region manipuladores de eventos de componentes internos
         private void On_EndReached(object sender, EventArgs e)
         {
             // passar para a próxima mídia da playlist?
@@ -766,33 +803,33 @@ namespace analise_libvlc
                         }
                         break;
                     }
-                //case Keys.D1: // CTRl + seta esqueda
-                //    {
-                //        if (IsControlDown() && rtTextBox.Focused)
-                //        {
-                //            e.SuppressKeyPress = true;
-                //            insertStrInText("M1");
-                //        }
-                //        break;
-                //    }
-                //case Keys.D2: // CTRl + seta esqueda
-                //    {
-                //        if (IsControlDown() && rtTextBox.Focused)
-                //        {
-                //            e.SuppressKeyPress = true;
-                //            insertStrInText("M2");
-                //        }
-                //        break;
-                //    }
-                //case Keys.D3: // CTRl + seta esqueda
-                //    {
-                //        if (IsControlDown() && rtTextBox.Focused)
-                //        {
-                //            e.SuppressKeyPress = true;
-                //            insertStrInText("M3");
-                //        }
-                //        break;
-                //    }
+                    //case Keys.D1: // CTRl + seta esqueda
+                    //    {
+                    //        if (IsControlDown() && rtTextBox.Focused)
+                    //        {
+                    //            e.SuppressKeyPress = true;
+                    //            insertStrInText("M1");
+                    //        }
+                    //        break;
+                    //    }
+                    //case Keys.D2: // CTRl + seta esqueda
+                    //    {
+                    //        if (IsControlDown() && rtTextBox.Focused)
+                    //        {
+                    //            e.SuppressKeyPress = true;
+                    //            insertStrInText("M2");
+                    //        }
+                    //        break;
+                    //    }
+                    //case Keys.D3: // CTRl + seta esqueda
+                    //    {
+                    //        if (IsControlDown() && rtTextBox.Focused)
+                    //        {
+                    //            e.SuppressKeyPress = true;
+                    //            insertStrInText("M3");
+                    //        }
+                    //        break;
+                    //    }
             }
         }
 
@@ -803,27 +840,7 @@ namespace analise_libvlc
         /*
          * para acessar os comandos disponíveis, digitar no cmd? vlc –-help  
          */
-        private void extractToWav(string sourcefile) // experimental
-        {
-            string destinationfile = Path.GetDirectoryName(sourcefile);
-
-            _libVLC.Log += (send, m) => Console.WriteLine($"[{m.Level}] {m.Module}:{m.Message}");
-
-            Media media = new Media(_libVLC, sourcefile, FromType.FromPath);
-
-            media.AddOption(":no-sout-video");
-            media.AddOption(":sout-audio");
-            media.AddOption(":sout-keep");
-            media.AddOption(":sout=#transcode{acodec=s16l,ab=128,channels=1,samplerate=24000}:" +
-                            "std{access=file,mux=wav,dst=" + sourcefile +
-                            ".wav" + "}");
-
-            MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
-
-            mPlayer.Play(media);
-            media.Dispose();
-        }
-
+        
         private byte[] getThumbnail(Media media, int i_width, int i_height) // experimental
         {
             media.AddOption(":no-audio");
@@ -834,7 +851,6 @@ namespace analise_libvlc
             return getThumbnail(media, i_width, i_height);
         }
         #endregion
-
     }
 
 }
