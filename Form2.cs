@@ -5,9 +5,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using LibVLCSharp.Shared;
-using static System.Net.WebRequestMethods;
-using System.Security.Cryptography.Xml;
-
+using System.Text;
+using System.Web;
 
 namespace analise_libvlc
 {
@@ -236,11 +235,12 @@ namespace analise_libvlc
 
                     case MouseButtons.Right:
                         // exclui item e depois atualiza novamente a tsplaylist
-                        var idx = _playlist.IndexOf((sender as ToolStripMenuItem).Text);
+                        var idx = _playlist.IndexOf((sender as ToolStripMenuItem).Text); // busca na playlist o item selecionado
+                        String strfile1 = Path.GetFileName(HttpUtility.UrlDecode(_mp.Media.Mrl));
+                        String strfile2 = Path.GetFileName(HttpUtility.UrlDecode(tsPlaylist.DropDownItems[idx].Text));
 
                         // não remover a mídia em reprodução atual!                        
-                        if (new Uri(_mp.Media.Mrl) ==
-                            new Uri(tsPlaylist.DropDownItems[idx].Text))
+                        if (strfile1 == strfile2)
                             break;
 
                         _playlist.RemoveAt(idx);
@@ -249,7 +249,7 @@ namespace analise_libvlc
                         break;
                 }
             }
-
+                        
             // atualiza itens na tsPlayList (tsPlaylist é o componente do Form)
             tsPlaylist.DropDownItems.Clear();
             tsPlaylist.ToolTipText = "Lista de reprodução para acesso rápido";
@@ -260,8 +260,15 @@ namespace analise_libvlc
                 tsPlaylist.DropDownItems[idx].MouseUp += new MouseEventHandler(ToolStripMenuItemClick); // associa handler para click
                 tsPlaylist.DropDownItems[idx].ToolTipText = "Para deletar clique com botão direito do mouse";
 
-                if (new Uri(_mp.Media.Mrl) == new Uri(tsPlaylist.DropDownItems[idx].Text))
-                    ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
+                String strfile1 = Path.GetFileName(HttpUtility.UrlDecode(_mp.Media.Mrl));
+                //strfile1 = HttpUtility.UrlDecode(strfile1);
+                //strfile1 = System.Text.RegularExpressions.Regex.Replace(strfile1, @"[^\w\.@-\\%]", "");
+                String strfile2 = Path.GetFileName(HttpUtility.UrlDecode(tsPlaylist.DropDownItems[idx].Text));
+                //strfile2 = System.Text.RegularExpressions.Regex.Replace(strfile2, @"[^\w\.@-\\%]", "");
+
+                //MessageBox.Show(strfile1 + "\n\r" + strfile2); // testes
+
+                if (strfile1 == strfile2) ((ToolStripMenuItem)tsPlaylist.DropDownItems[idx]).Checked = true;
             }
         }
 
@@ -271,7 +278,7 @@ namespace analise_libvlc
             {
                 //var media = new Media(_libVLC, new Uri(filePath));
                 //
-                _libVLC.SetLogFile("D:\\logs.txt");
+                //_libVLC.SetLogFile("D:\\logs.txt");
 
                 var mediaOptions = new string[]
                 {
@@ -281,17 +288,17 @@ namespace analise_libvlc
 
                 //var media = new Media(_libVLC, filePath, FromType.FromPath, mediaOptions);
                 var media = new Media(_libVLC, filePath, FromType.FromPath);
-                _mp.Media = media;
-                //_mp.Media.AddOptionFlag(":video-filter=transform", 90);
-                //_mp.Media.AddOptionFlag(":transform-type=90");
+
+                //_mp.Media.AddOption(":video-filter=transform");
+                //_mp.Media.AddOption(":transform-type=90");
                 // se tiver stream de vídeo cria outra janela? mas com foco no richtext
                 //_mp.Hwnd = base.Handle; // handle do form principal. TO DO: Criar outra janela
 
-                if (!_mp.Play())
+                if (!_mp.Play(media))
                     MessageBox.Show("erro na reprodução!");
                 //_mp.Media.AddOption(":video-filter=transform");
                 //_mp.Media.AddOption(":transform-type=90");
-                
+
                 media.Dispose();
             }
             catch (Exception ex)
@@ -303,7 +310,7 @@ namespace analise_libvlc
             AtualizatsPlaylist();
             if (!rtTextBox.Focused) rtTextBox.Focus(); // não está funcionando para vídeo!
 
-            _libVLC.CloseLogFile();
+            //_libVLC.CloseLogFile();
         }
 
         private void PlayPause(object sender, EventArgs e)
@@ -393,29 +400,6 @@ namespace analise_libvlc
             //    MessageBox.Show("Arquivo PNG salvo em: " + image_path); // salva arquivo WAV na mesma pasta da origem
             //media.Dispose();
 
-            //--scene-format= < string > Image format
-            //   Format of the output images(png, jpeg, ...).
-            //--scene-width= < integer > Image width
-            //    You can enforce the image width.By default(- 1) VLC will adapt to
-            //    the video characteristics.
-            //--scene-height= < integer > Image height
-            //    You can enforce the image height.By default(- 1) VLC will adapt to
-            //    the video characteristics.
-            //--scene-prefix= < string > Filename prefix
-            //    Prefix of the output images filenames.Output filenames will have the
-            //    "prefixNUMBER.format" form if replace is not true.
-            //--scene-path= < string > Directory path prefix
-            //    Directory path where images files should be saved. If not set, then
-            //    images will be automatically saved in users homedir.
-            //--scene-replace, --no-scene-replace
-            //                           Always write to the same file
-            //                           (default disabled)
-            //    Always write to the same file instead of creating one file per image.
-            //    In this case, the number is not appended to the filename.
-            //--scene-ratio =< integer[1..2147483647] >
-            //                           Recording ratio
-            //    Ratio of images to record. 3 means that one image out of three is
-            //    recorded.
 
             // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
             if (_mp.TakeSnapshot(0, image_path, 0, 0))
@@ -436,7 +420,7 @@ namespace analise_libvlc
             /* "pathtovideo" --video - filter = scene--vout = dummy--start - time = 300--stop - time = 600--scene - ratio = 250--scene - path = "pathtosaveimages" vlc://quit
              * 
              * 
-             
+
             */
         }
         private bool MediaPlayerNotOK()
@@ -959,7 +943,7 @@ namespace analise_libvlc
         }
 
         // to do: atualizar o label dinamicamente. quando estiver sob a progressbar e quando estiver fora
-        
+
 
         #endregion
 

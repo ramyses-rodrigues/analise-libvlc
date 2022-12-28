@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	
 	<PropertyGroup>
 		<Title>analise-libvlc</Title>
 		<OutputType>WinExe</OutputType>
@@ -9,6 +10,7 @@
 		<Description>Análise de conteúdo com dotNET</Description>
 	</PropertyGroup>
 	<ItemGroup>
+	
 	  <PackageReference Include="LibVLCSharp" Version="3.6.7" />
 	  <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
 	</ItemGroup>
