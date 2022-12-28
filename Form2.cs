@@ -296,8 +296,7 @@ namespace analise_libvlc
 
                 if (!_mp.Play(media))
                     MessageBox.Show("erro na reprodução!");
-                //_mp.Media.AddOption(":video-filter=transform");
-                //_mp.Media.AddOption(":transform-type=90");
+                
 
                 media.Dispose();
             }
