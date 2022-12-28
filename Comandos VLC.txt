@@ -70,21 +70,24 @@ Sintaxe da URL:
       --mouse-hide-timeout=<inteiro>
                                  Ocultar o cursor e o controle de Tela Inteira após x milissegundos
    Capturar Imagem:
-      --snapshot-path=<string>   Pasta (ou nome do arquivo) de captura de imagens de ví­deo
-      --snapshot-prefix=<string> Extensão do arquivo de captura de imagens de ví­deo
-      --snapshot-format={png,jpg,tiff}
-                                 Formato de captura de imagens de ví­deo
-      --snapshot-preview, --no-snapshot-preview
+      --snapshot-path=<string>   
+                                Pasta (ou nome do arquivo) de captura de imagens de ví­deo
+      --snapshot-prefix=<string> 
+                                Extensão do arquivo de captura de imagens de ví­deo
+      --snapshot-format={png,jpg,tiff} 
+                                Formato de captura de imagens de ví­deo
+      --snapshot-preview, --no-snapshot-preview 
                                  Exibir miniatura da imagem capturada do ví­deo
                                  (O padrão é habilitado)
       --snapshot-sequential, --no-snapshot-sequential
-                                 Usar níºmeros seqí¼enciais em vez de informação de data e hora
+                                 Usar números sequenciais em vez de informação de data e hora
                                  (O padrão é desabilitado)
    Propriedades da janela:
       --crop=<string>            Aparar ví­deo
       --custom-crop-ratios=<string>
                                  Lista personalizada de proporções de recorte
-      --aspect-ratio=<string>    Proporção da fonte
+      --aspect-ratio=<string>      
+                                Proporção da fonte
       --autoscale, --no-autoscale
                                  Ajuste Automático de Ví­deo
                                  (O padrão é habilitado)

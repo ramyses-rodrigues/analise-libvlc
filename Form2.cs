@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using LibVLCSharp.Shared;
+using static System.Net.WebRequestMethods;
+using System.Security.Cryptography.Xml;
 
 
 namespace analise_libvlc
@@ -268,13 +270,28 @@ namespace analise_libvlc
             try
             {
                 //var media = new Media(_libVLC, new Uri(filePath));
-                var media = new Media(_libVLC, filePath, FromType.FromPath);
+                //
+                _libVLC.SetLogFile("D:\\logs.txt");
 
+                var mediaOptions = new string[]
+                {
+                    ":video-filter=transform",
+                    "transform-type=90"
+                };
+
+                //var media = new Media(_libVLC, filePath, FromType.FromPath, mediaOptions);
+                var media = new Media(_libVLC, filePath, FromType.FromPath);
+                _mp.Media = media;
+                //_mp.Media.AddOptionFlag(":video-filter=transform", 90);
+                //_mp.Media.AddOptionFlag(":transform-type=90");
                 // se tiver stream de vídeo cria outra janela? mas com foco no richtext
                 //_mp.Hwnd = base.Handle; // handle do form principal. TO DO: Criar outra janela
 
-                if (!_mp.Play(media))
+                if (!_mp.Play())
                     MessageBox.Show("erro na reprodução!");
+                //_mp.Media.AddOption(":video-filter=transform");
+                //_mp.Media.AddOption(":transform-type=90");
+                
                 media.Dispose();
             }
             catch (Exception ex)
@@ -285,6 +302,8 @@ namespace analise_libvlc
             // atualiza playlist            
             AtualizatsPlaylist();
             if (!rtTextBox.Focused) rtTextBox.Focus(); // não está funcionando para vídeo!
+
+            _libVLC.CloseLogFile();
         }
 
         private void PlayPause(object sender, EventArgs e)
@@ -351,23 +370,28 @@ namespace analise_libvlc
             String _path = _mp.Media.Mrl;
             _path = _path.Replace("file:///", ""); // retira o termo "file:///" que vem na string Mrl...
                                                    //_path = _path.Substring(8); 
+                                                   //_path = Path.GetFullPath(_path);
+                                                   //_path = _path.Replace("%20", "-"); // retira o termo "file:///" que vem na string Mrl...
+                                                   //_path = _path.Substring(8);
             String image_path = Path.GetDirectoryName(_path) + "\\" + // constroi nome único
                                 Path.GetFileNameWithoutExtension(_path) +
                                 "-" + time.ToString() + ".png";
 
-            Media media = new Media(_libVLC, _path, FromType.FromPath);
-            
-            media.AddOption(":video-filter=scene");
-            media.AddOption(":scene-format=png");
-            media.AddOption(":vout=dummy");
-            //media.AddOption("--start-time=" + time.ToString());
-            //media.AddOption("--stop-time=" + time.ToString());
-            media.AddOption(":scene-ratio=100");
-            media.AddOption(":scene-path=" + Path.GetDirectoryName(image_path));
-            MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
-            if (mPlayer.Play(media))
-                MessageBox.Show("Arquivo PNG salvo em: " + image_path); // salva arquivo WAV na mesma pasta da origem
-            media.Dispose();
+            //Media media = new Media(_libVLC, _path, FromType.FromPath);
+
+            //media.AddOption(":video-filter=scene");
+            //media.AddOption(":scene-format=jpg");
+            //media.AddOption(":vout=dummy");
+            //media.AddOption(":start-time=10");
+            //media.AddOption(":stop-time=15");
+            //media.AddOption(":scene-ratio=1");            
+            //media.AddOption(":scene-path=" + Path.GetDirectoryName(image_path));
+            ////media.AddOption("vlc://quit");
+
+            //MediaPlayer mPlayer = new MediaPlayer(media);
+            //if (mPlayer.Play(media))
+            //    MessageBox.Show("Arquivo PNG salvo em: " + image_path); // salva arquivo WAV na mesma pasta da origem
+            //media.Dispose();
 
             //--scene-format= < string > Image format
             //   Format of the output images(png, jpeg, ...).
@@ -394,18 +418,18 @@ namespace analise_libvlc
             //    recorded.
 
             // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
-            //if (_mp.TakeSnapshot(0, image_path, w, h))
-            //{
-            //    // pega novamente o arquivo e coloca na clipboard?
-            //    if (SourceFileNotOK(image_path)) return;
+            if (_mp.TakeSnapshot(0, image_path, 0, 0))
+            {
+                // pega novamente o arquivo e coloca na clipboard?
+                if (SourceFileNotOK(image_path)) return;
 
-            //    Image img = Image.FromFile(image_path);
-            //    Clipboard.SetImage(img);
-            //    if (rtTextBox.Focused) rtTextBox.Paste();
+                Image img = Image.FromFile(image_path);
+                Clipboard.SetImage(img);
+                if (rtTextBox.Focused) rtTextBox.Paste();
 
-            //    MessageBox.Show("Arquivo " + Path.GetFileNameWithoutExtension(image_path)
-            //    + " salvo com sucesso na pasta " + Path.GetDirectoryName(image_path));
-            //}
+                MessageBox.Show("Arquivo " + Path.GetFileNameWithoutExtension(image_path)
+                + " salvo com sucesso na pasta " + Path.GetDirectoryName(image_path));
+            }
 
 
 
@@ -442,11 +466,11 @@ namespace analise_libvlc
 
             MediaPlayer mPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
 
-            mPlayer.Play(media); // salva arquivo WAV na mesma pasta da origem
-            media.Dispose();
-
-            MessageBox.Show("Arquivo WAV salvo em: " + destinationfile + ".wav");
-
+            if (mPlayer.Play(media)) // salva arquivo WAV na mesma pasta da origem
+            {
+                MessageBox.Show("Arquivo WAV salvo em: " + destinationfile + ".wav");
+                media.Dispose();
+            }
         }
 
         #endregion
@@ -595,7 +619,15 @@ namespace analise_libvlc
             TimeSpan ts = TimeSpan.FromMilliseconds(iPos > 0 & iPos < _mp.Length ? iPos : 0);
             labelStatus1.Text = "Ir para posição: " + ts.ToString(@"hh\:mm\:ss");
         }
+        private void progressBar1_MouseEnter(object sender, EventArgs e)
+        {
+            _mouseInProgressBar = true;
+        }
 
+        private void progressBar1_MouseLeave(object sender, EventArgs e)
+        {
+            _mouseInProgressBar = false;
+        }
 
         private void carregarTextoToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -732,7 +764,7 @@ namespace analise_libvlc
             //_playlist.Add(fpath);
             //OpenMediaFile(fpath);
 
-            OpenMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+            //OpenMediaFile("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
         }
 
         private void On_MouseWheel(object sender, MouseEventArgs e)
@@ -873,6 +905,7 @@ namespace analise_libvlc
                         if (IsControlDown() && rtTextBox.Focused)
                         {
                             e.SuppressKeyPress = true;
+                            //_mp.NextFrame();
                             Backward(null, null);
                         }
                         break;
@@ -926,15 +959,7 @@ namespace analise_libvlc
         }
 
         // to do: atualizar o label dinamicamente. quando estiver sob a progressbar e quando estiver fora
-        private void progressBar1_MouseEnter(object sender, EventArgs e)
-        {
-            _mouseInProgressBar = true;
-        }
-
-        private void progressBar1_MouseLeave(object sender, EventArgs e)
-        {
-            _mouseInProgressBar = false;
-        }
+        
 
         #endregion
 
