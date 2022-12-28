@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using LibVLCSharp.Shared;
 using System.Text;
 using System.Web;
+using System.Reflection.PortableExecutable;
 
 namespace analise_libvlc
 {
@@ -243,9 +244,9 @@ namespace analise_libvlc
                         if (strfile1 == strfile2)
                             break;
 
-                        _playlist.RemoveAt(idx);
+                        _playlist.RemoveAt(idx); // remove item da playlist da memória
 
-                        AtualizatsPlaylist();
+                        AtualizatsPlaylist(); //atualiza
                         break;
                 }
             }
@@ -276,23 +277,23 @@ namespace analise_libvlc
         {
             try
             {
-                //var media = new Media(_libVLC, new Uri(filePath));
-                //
+                
                 //_libVLC.SetLogFile("D:\\logs.txt");
-
-                var mediaOptions = new string[]
-                {
-                    ":video-filter=transform",
-                    "transform-type=90"
-                };
-
-                //var media = new Media(_libVLC, filePath, FromType.FromPath, mediaOptions);
+                
                 var media = new Media(_libVLC, filePath, FromType.FromPath);
-
-                //_mp.Media.AddOption(":video-filter=transform");
-                //_mp.Media.AddOption(":transform-type=90");
+                
                 // se tiver stream de vídeo cria outra janela? mas com foco no richtext
                 //_mp.Hwnd = base.Handle; // handle do form principal. TO DO: Criar outra janela
+                if (!MediaWithoutVideoStream())
+                {
+                    //_mp.Media.AddOption(":video-filter=transform");
+                    //_mp.Media.AddOption(":transform-type=90");
+                    //_mp.Media.AddOption(":width=300");
+                    //_mp.Media.AddOption(":height=300");
+                    _mp.AspectRatio = "1:1";
+                    
+                    //_mp.SetVideoFormat("RV32", 300, 300, 1); // ajusta a janela do vídeo
+                }
 
                 if (!_mp.Play(media))
                     MessageBox.Show("erro na reprodução!");
@@ -362,18 +363,17 @@ namespace analise_libvlc
             // int result = libvlc_video_take_snapshot(mp, 0, image_path, 0, 0);
             // parece que "file:" está atrapalhando...
             if (MediaPlayerNotOK()) return;
+            if (MediaWithoutVideoStream()) return;
 
             //obtém dimensões informações sobre o frame
             var vtrackidx = _mp.VideoTrack; // obtém índice da stream do fluxo de vídeo
-            if (vtrackidx < 0) return; // se não houver stream de vídeo, retorna
-
             var info = _mp.Media.Tracks;
             long time = _mp.Time;
 
             uint w = _mp.Media.Tracks[vtrackidx].Data.Video.Width;
             uint h = _mp.Media.Tracks[vtrackidx].Data.Video.Height;
 
-            String _path = _mp.Media.Mrl;
+            String _path = HttpUtility.UrlDecode(_mp.Media.Mrl);
             _path = _path.Replace("file:///", ""); // retira o termo "file:///" que vem na string Mrl...
                                                    //_path = _path.Substring(8); 
                                                    //_path = Path.GetFullPath(_path);
@@ -382,23 +382,7 @@ namespace analise_libvlc
             String image_path = Path.GetDirectoryName(_path) + "\\" + // constroi nome único
                                 Path.GetFileNameWithoutExtension(_path) +
                                 "-" + time.ToString() + ".png";
-
-            //Media media = new Media(_libVLC, _path, FromType.FromPath);
-
-            //media.AddOption(":video-filter=scene");
-            //media.AddOption(":scene-format=jpg");
-            //media.AddOption(":vout=dummy");
-            //media.AddOption(":start-time=10");
-            //media.AddOption(":stop-time=15");
-            //media.AddOption(":scene-ratio=1");            
-            //media.AddOption(":scene-path=" + Path.GetDirectoryName(image_path));
-            ////media.AddOption("vlc://quit");
-
-            //MediaPlayer mPlayer = new MediaPlayer(media);
-            //if (mPlayer.Play(media))
-            //    MessageBox.Show("Arquivo PNG salvo em: " + image_path); // salva arquivo WAV na mesma pasta da origem
-            //media.Dispose();
-
+            
 
             // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
             if (_mp.TakeSnapshot(0, image_path, 0, 0))
@@ -431,6 +415,10 @@ namespace analise_libvlc
             return !System.IO.File.Exists(sourcefile);
         }
 
+        private bool MediaWithoutVideoStream()
+        {
+            return _mp.VideoTrack < 0; // se não houver índice de stream de vídeo, retorna true
+        }
         private void extractToWav(string sourcefile) // experimental
         {
             if (SourceFileNotOK(sourcefile)) return;
@@ -458,7 +446,7 @@ namespace analise_libvlc
 
         #endregion
 
-        #region handlers de menu e botõesd da toolbar
+        #region handlers de menu e botões da toolbar
         private void abrirToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             var filePath = String.Empty;
@@ -522,7 +510,7 @@ namespace analise_libvlc
             Media media = _mp.Media;
 
             String songMetadata = "Informações da mídia atual: \r\n";
-            songMetadata += "URL: " + new Uri(media.Mrl) + "\r\n\r\n";
+            songMetadata += "URL: " + HttpUtility.UrlDecode(media.Mrl) + "\r\n\r\n";
 
             var info = media.Tracks;
             int len = info.Length;
@@ -888,7 +876,6 @@ namespace analise_libvlc
                         if (IsControlDown() && rtTextBox.Focused)
                         {
                             e.SuppressKeyPress = true;
-                            //_mp.NextFrame();
                             Backward(null, null);
                         }
                         break;
