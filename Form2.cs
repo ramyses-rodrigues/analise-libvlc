@@ -250,7 +250,7 @@ namespace analise_libvlc
                         break;
                 }
             }
-                        
+
             // atualiza itens na tsPlayList (tsPlaylist é o componente do Form)
             tsPlaylist.DropDownItems.Clear();
             tsPlaylist.ToolTipText = "Lista de reprodução para acesso rápido";
@@ -277,11 +277,11 @@ namespace analise_libvlc
         {
             try
             {
-                
+
                 //_libVLC.SetLogFile("D:\\logs.txt");
-                
+
                 var media = new Media(_libVLC, filePath, FromType.FromPath);
-                
+
                 // se tiver stream de vídeo cria outra janela? mas com foco no richtext
                 //_mp.Hwnd = base.Handle; // handle do form principal. TO DO: Criar outra janela
                 if (!MediaWithoutVideoStream())
@@ -291,13 +291,13 @@ namespace analise_libvlc
                     //_mp.Media.AddOption(":width=300");
                     //_mp.Media.AddOption(":height=300");
                     _mp.AspectRatio = "1:1";
-                    
+
                     //_mp.SetVideoFormat("RV32", 300, 300, 1); // ajusta a janela do vídeo
                 }
 
                 if (!_mp.Play(media))
                     MessageBox.Show("erro na reprodução!");
-                
+
 
                 media.Dispose();
             }
@@ -382,7 +382,7 @@ namespace analise_libvlc
             String image_path = Path.GetDirectoryName(_path) + "\\" + // constroi nome único
                                 Path.GetFileNameWithoutExtension(_path) +
                                 "-" + time.ToString() + ".png";
-            
+
 
             // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
             if (_mp.TakeSnapshot(0, image_path, 0, 0))
@@ -485,13 +485,21 @@ namespace analise_libvlc
             }
         }
 
-        private void abrirURLToolStripMenuItem1_Click(object sender, EventArgs e)
+        private async void abrirURLToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            var filePath = ShowDialog("Entre com a URL", "URL: ");
-            if (filePath != string.Empty)
-            {
-                OpenMediaFile(filePath);
-            }
+            // em desenvolvimento
+
+            var url = ShowDialog("Entre com a URL", "URL: ");
+            if (url == String.Empty) return;
+
+            //url = "https://www.youtube.com/watch?v=aqz-KE-bpKQ";
+            //http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
+            var media = new Media(_libVLC, new Uri(url));
+
+            await media.Parse(MediaParseOptions.ParseNetwork);
+            if (media.SubItems.Count > 0)
+                _mp.Play(media.SubItems.First());
+
         }
 
         private void informaçõesDaMídiaToolStripMenuItem_Click(object sender, EventArgs e)

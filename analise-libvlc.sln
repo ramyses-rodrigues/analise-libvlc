@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VLC_Media_Player_2", "..\VL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibVLCSharp", "..\..\LibVLCSharp\src\LibVLCSharp\LibVLCSharp.csproj", "{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Speech", "..\..\libvlcsharp-samples-master\libvlcsharp-samples-master\Speech\Speech.csproj", "{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,14 @@ Global
 		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Win32Debug|Any CPU.Build.0 = Win32Debug|Any CPU
 		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Win32Release|Any CPU.ActiveCfg = Win32Release|Any CPU
 		{8CD2E643-FEF6-4438-BDE7-C8A3DB104E30}.Win32Release|Any CPU.Build.0 = Win32Release|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Win32Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Win32Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Win32Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA49D0CB-C3F2-40C4-9EEF-370F614373EE}.Win32Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
