@@ -16,7 +16,7 @@ namespace analise_libvlc
 
         #region variáveis globais
         private readonly LibVLC _libVLC; // engine
-        private MediaPlayer _mp; // mediaplayer
+        private MediaPlayer _mediaplayer; // mediaplayer
         private Timer _aTimer; // timer
         private List<String> _playlist; // armazena playlist
         private ContextMenuStrip _playlistContextMenuStrip; // 
@@ -48,13 +48,13 @@ namespace analise_libvlc
 
             // cria objeto Media Player e configura manipuladores de eventos
             // Note: You may create multiple mediaplayers from a single LibVLC instance
-            _mp = new MediaPlayer(_libVLC);
-            _mp.EndReached += new EventHandler<EventArgs>(On_EndReached);
-            _mp.Stopped += new EventHandler<EventArgs>(On_Stopped);
-            _mp.TimeChanged += new EventHandler<MediaPlayerTimeChangedEventArgs>(On_MediaPlayerTimerChanged);
-            _mp.Forward += new EventHandler<EventArgs>(On_MediaPlayerForward);
-            _mp.Backward += new EventHandler<EventArgs>(On_MediaPlayerBackward);
-            _mp.PositionChanged += new EventHandler<MediaPlayerPositionChangedEventArgs>(On_PositionChanged);
+            _mediaplayer = new MediaPlayer(_libVLC);
+            _mediaplayer.EndReached += new EventHandler<EventArgs>(On_EndReached);
+            _mediaplayer.Stopped += new EventHandler<EventArgs>(On_Stopped);
+            _mediaplayer.TimeChanged += new EventHandler<MediaPlayerTimeChangedEventArgs>(On_MediaPlayerTimerChanged);
+            _mediaplayer.Forward += new EventHandler<EventArgs>(On_MediaPlayerForward);
+            _mediaplayer.Backward += new EventHandler<EventArgs>(On_MediaPlayerBackward);
+            _mediaplayer.PositionChanged += new EventHandler<MediaPlayerPositionChangedEventArgs>(On_PositionChanged);
 
             // cria um timer para exibição de instante de tempo e outras funções para o usuário.
             _aTimer = new Timer();
@@ -81,7 +81,7 @@ namespace analise_libvlc
             void ToolStripMenuItemClick(object sender, EventArgs e)
             {
                 if ((sender as ToolStripMenuItem).Text != String.Empty)
-                    _mp.SetRate(float.Parse((sender as ToolStripMenuItem).Text));
+                    _mediaplayer.SetRate(float.Parse((sender as ToolStripMenuItem).Text));
             }
 
             // atualiza itens na tsRate
@@ -150,8 +150,8 @@ namespace analise_libvlc
             dlg.Filter = "*.rtf|*.rtf";
             dlg.RestoreDirectory = true;
 
-            if (_mp.Media != null)
-                dlg.FileName = Path.GetFileNameWithoutExtension(_mp.Media.Mrl) + ".rtf";
+            if (_mediaplayer.Media != null)
+                dlg.FileName = Path.GetFileNameWithoutExtension(_mediaplayer.Media.Mrl) + ".rtf";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -163,11 +163,11 @@ namespace analise_libvlc
         {
             if (MediaPlayerNotOK()) return;
 
-            var ctime = _mp.Time; // posição da stream em milisegundos e converte parA Timespan
-            TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < _mp.Length ? ctime : 0);
+            var ctime = _mediaplayer.Time; // posição da stream em milisegundos e converte parA Timespan
+            TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < _mediaplayer.Length ? ctime : 0);
 
             string strText = "Posição " + ts.ToString(@"hh\:mm\:ss") + " - (" +
-                                  (_mp.Time >= 0 ? _mp.Time.ToString() : "0") + ")\r\n";
+                                  (_mediaplayer.Time >= 0 ? _mediaplayer.Time.ToString() : "0") + ")\r\n";
 
             rtTextBox.AppendText(strText); // insere texto na posição atual do cursor
 
@@ -194,7 +194,7 @@ namespace analise_libvlc
             // extrai valor em milisegundos da linha
             var iTime = sLine.Substring(startIndex, endIndex - startIndex);
 
-            _mp.Time = Convert.ToInt64(iTime); // posiciona a mídia no instante desejado
+            _mediaplayer.Time = Convert.ToInt64(iTime); // posiciona a mídia no instante desejado
 
         }
 
@@ -237,7 +237,7 @@ namespace analise_libvlc
                     case MouseButtons.Right:
                         // exclui item e depois atualiza novamente a tsplaylist
                         var idx = _playlist.IndexOf((sender as ToolStripMenuItem).Text); // busca na playlist o item selecionado
-                        String strfile1 = Path.GetFileName(HttpUtility.UrlDecode(_mp.Media.Mrl));
+                        String strfile1 = Path.GetFileName(HttpUtility.UrlDecode(_mediaplayer.Media.Mrl));
                         String strfile2 = Path.GetFileName(HttpUtility.UrlDecode(tsPlaylist.DropDownItems[idx].Text));
 
                         // não remover a mídia em reprodução atual!                        
@@ -261,7 +261,7 @@ namespace analise_libvlc
                 tsPlaylist.DropDownItems[idx].MouseUp += new MouseEventHandler(ToolStripMenuItemClick); // associa handler para click
                 tsPlaylist.DropDownItems[idx].ToolTipText = "Para deletar clique com botão direito do mouse";
 
-                String strfile1 = Path.GetFileName(HttpUtility.UrlDecode(_mp.Media.Mrl));
+                String strfile1 = Path.GetFileName(HttpUtility.UrlDecode(_mediaplayer.Media.Mrl));
                 //strfile1 = HttpUtility.UrlDecode(strfile1);
                 //strfile1 = System.Text.RegularExpressions.Regex.Replace(strfile1, @"[^\w\.@-\\%]", "");
                 String strfile2 = Path.GetFileName(HttpUtility.UrlDecode(tsPlaylist.DropDownItems[idx].Text));
@@ -281,24 +281,17 @@ namespace analise_libvlc
                 //_libVLC.SetLogFile("D:\\logs.txt");
 
                 var media = new Media(_libVLC, filePath, FromType.FromPath);
+                if (!_mediaplayer.Play(media))
+                    MessageBox.Show("erro na reprodução!");
 
                 // se tiver stream de vídeo cria outra janela? mas com foco no richtext
                 //_mp.Hwnd = base.Handle; // handle do form principal. TO DO: Criar outra janela
                 if (!MediaWithoutVideoStream())
-                {
-                    //_mp.Media.AddOption(":video-filter=transform");
-                    //_mp.Media.AddOption(":transform-type=90");
-                    //_mp.Media.AddOption(":width=300");
-                    //_mp.Media.AddOption(":height=300");
-                    _mp.AspectRatio = "1:1";
-
-                    //_mp.SetVideoFormat("RV32", 300, 300, 1); // ajusta a janela do vídeo
+                {                    
+                    //_mp.AspectRatio = "3:4";
+                    _mediaplayer.SetVideoFormat("RV32", 300, 300, 1); // ajusta a janela do vídeo                    
                 }
-
-                if (!_mp.Play(media))
-                    MessageBox.Show("erro na reprodução!");
-
-
+                
                 media.Dispose();
             }
             catch (Exception ex)
@@ -318,43 +311,75 @@ namespace analise_libvlc
             // houve necessidade de implementar com os argumentos sender e "e" porque essa função foi ligada
             // ao evendo do botão Play/Pause de forma dinâmica, na inicialização do Form
 
-            if (!_mp.IsPlaying)
+            if (!_mediaplayer.IsPlaying)
             {
-                _mp.Play(); // coloca em estado de reprodução para possibilitar o seek e/ou pause
+                _mediaplayer.Play(); // coloca em estado de reprodução para possibilitar o seek e/ou pause
             }
 
             // Todo: quando chega ao final do fluxo (State == Ended), só depois que clica em Stop ele é capaz de reproduzir de novo
             // corrigir!
-            _mp.SetPause(_mp.IsPlaying);
+            _mediaplayer.SetPause(_mediaplayer.IsPlaying);
         }
 
         private void Stop(object sender, EventArgs e)
         {
-            _mp.Stop();
+            _mediaplayer.Stop();
+        }
+
+        private void customSetPosTs(TimeSpan pos)
+        {
+            if (_mediaplayer.State == VLCState.Stopped)
+            {
+                _mediaplayer.Play(); //otherwise not seekable for some silly reason                
+                _mediaplayer.Pause(); // não está funcionando
+                //SeekTo(pos);  //_mediaplayer.Time = pos;
+            }
+            //else
+            //{
+                //_mediaplayer.Time = pos;
+                //SeekTo(pos);
+            //}
+            SeekTo(pos);
         }
 
         private void customSetPos(long pos)
         {
-            if (_mp.State == VLCState.Stopped)
+            if (_mediaplayer.State == VLCState.Stopped)
             {
-                _mp.Play(); //otherwise not seekable for some silly reason                
-                _mp.Pause(); // não está funcionando
-                _mp.Time = pos;
+                _mediaplayer.Play(); //otherwise not seekable for some silly reason                
+                _mediaplayer.Pause(); // não está funcionando
+                //SeekTo(pos);  //_mediaplayer.Time = pos;
             }
-            else
-            {
-                _mp.Time = pos;
-            }
+            //else
+            //{
+            //_mediaplayer.Time = pos;
+            //SeekTo(pos);
+            //}
+            _mediaplayer.Time = pos;
+        }
+
+        private void SeekTo(TimeSpan seconds) // pagedown
+        {
+            _mediaplayer.Time = (long)seconds.TotalMilliseconds;
         }
 
         private void Backward(object sender, EventArgs e) // pagedown
         {
-            customSetPos(_mp.Time - _step);
+            customSetPos(_mediaplayer.Time - _step);
+            //TimeSpan fpos = TimeSpan.FromMilliseconds(_step);
+            //double ppos = _mediaplayer.Time;
+            //TimeSpan ipos = TimeSpan.FromMilliseconds(ppos);
+            
+            //TimeSpan pos = ipos - fpos;
+            ////TimeSpan pos = TimeSpan.FromMilliseconds(_mediaplayer.Time) - TimeSpan.FromSeconds(_step / 1000);
+            //customSetPos(pos);
         }
 
         private void Forward(object sender, EventArgs e) // pageup
         {
-            customSetPos(_mp.Time + _step);
+            customSetPos(_mediaplayer.Time + _step);
+            //TimeSpan pos = TimeSpan.FromMilliseconds(_mediaplayer.Time) + TimeSpan.FromSeconds(_step / 1000);
+            //customSetPos(pos);
         }
 
         private void GetPicture()
@@ -366,14 +391,14 @@ namespace analise_libvlc
             if (MediaWithoutVideoStream()) return;
 
             //obtém dimensões informações sobre o frame
-            var vtrackidx = _mp.VideoTrack; // obtém índice da stream do fluxo de vídeo
-            var info = _mp.Media.Tracks;
-            long time = _mp.Time;
+            var vtrackidx = _mediaplayer.VideoTrack; // obtém índice da stream do fluxo de vídeo
+            var info = _mediaplayer.Media.Tracks;
+            long time = _mediaplayer.Time;
 
-            uint w = _mp.Media.Tracks[vtrackidx].Data.Video.Width;
-            uint h = _mp.Media.Tracks[vtrackidx].Data.Video.Height;
+            uint w = _mediaplayer.Media.Tracks[vtrackidx].Data.Video.Width;
+            uint h = _mediaplayer.Media.Tracks[vtrackidx].Data.Video.Height;
 
-            String _path = HttpUtility.UrlDecode(_mp.Media.Mrl);
+            String _path = HttpUtility.UrlDecode(_mediaplayer.Media.Mrl);
             _path = _path.Replace("file:///", ""); // retira o termo "file:///" que vem na string Mrl...
                                                    //_path = _path.Substring(8); 
                                                    //_path = Path.GetFullPath(_path);
@@ -385,7 +410,7 @@ namespace analise_libvlc
 
 
             // observar que qualquer falha no nome do arquivo a função não funciona, mesmo retornando OK
-            if (_mp.TakeSnapshot(0, image_path, 0, 0))
+            if (_mediaplayer.TakeSnapshot(0, image_path, 0, 0))
             {
                 // pega novamente o arquivo e coloca na clipboard?
                 if (SourceFileNotOK(image_path)) return;
@@ -408,7 +433,7 @@ namespace analise_libvlc
         }
         private bool MediaPlayerNotOK()
         {
-            return ((_mp == null) || (_mp.Media == null));
+            return ((_mediaplayer == null) || (_mediaplayer.Media == null));
         }
         private bool SourceFileNotOK(string sourcefile)
         {
@@ -417,7 +442,7 @@ namespace analise_libvlc
 
         private bool MediaWithoutVideoStream()
         {
-            return _mp.VideoTrack < 0; // se não houver índice de stream de vídeo, retorna true
+            return _mediaplayer.VideoTrack < 0; // se não houver índice de stream de vídeo, retorna true
         }
         private void extractToWav(string sourcefile) // experimental
         {
@@ -498,7 +523,7 @@ namespace analise_libvlc
 
             await media.Parse(MediaParseOptions.ParseNetwork);
             if (media.SubItems.Count > 0)
-                _mp.Play(media.SubItems.First());
+                _mediaplayer.Play(media.SubItems.First());
 
         }
 
@@ -515,7 +540,7 @@ namespace analise_libvlc
             }
 
             if (MediaPlayerNotOK()) return;
-            Media media = _mp.Media;
+            Media media = _mediaplayer.Media;
 
             String songMetadata = "Informações da mídia atual: \r\n";
             songMetadata += "URL: " + HttpUtility.UrlDecode(media.Mrl) + "\r\n\r\n";
@@ -571,7 +596,7 @@ namespace analise_libvlc
 
             int pos = CalcProgressBarRelativeMouse(sender); // retorna um inteiro [0:100] com a posição relativa do mouse sobre a barra
             if (pos >= 0)
-                _mp.Position = (float)pos / 100;
+                _mediaplayer.Position = (float)pos / 100;
         }
 
         private void progressBar1_MouseMove(object sender, MouseEventArgs e)
@@ -592,10 +617,10 @@ namespace analise_libvlc
 
             // retorna um inteiro [0:100] com a posição relativa do mouse sobre a progressbar
             int pos = CalcProgressBarRelativeMouse(sender);
-            var iPos = (pos * _mp.Length / 100);
+            var iPos = (pos * _mediaplayer.Length / 100);
 
             // converte para formato de hh:min:seg
-            TimeSpan ts = TimeSpan.FromMilliseconds(iPos > 0 & iPos < _mp.Length ? iPos : 0);
+            TimeSpan ts = TimeSpan.FromMilliseconds(iPos > 0 & iPos < _mediaplayer.Length ? iPos : 0);
             labelStatus1.Text = "Ir para posição: " + ts.ToString(@"hh\:mm\:ss");
         }
         private void progressBar1_MouseEnter(object sender, EventArgs e)
@@ -617,7 +642,7 @@ namespace analise_libvlc
             {
                 openFileDialog.Multiselect = false;
                 openFileDialog.Filter = "All files (*.rtf)|*.rtf";
-                openFileDialog.InitialDirectory = Path.GetDirectoryName(_mp.Media.Mrl);
+                openFileDialog.InitialDirectory = Path.GetDirectoryName(_mediaplayer.Media.Mrl);
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -662,6 +687,7 @@ namespace analise_libvlc
         #region manipuladores de eventos de componentes internos
         private void On_EndReached(object sender, EventArgs e)
         {
+            // _mediaplayer.Stop(); // está travando o app !! - corrigir
             // passar para a próxima mídia da playlist?
         }
 
@@ -677,7 +703,7 @@ namespace analise_libvlc
 
         delegate void OnMediaPlayerPositionChangedDelegate(String txt, int val);
         private void UpdateCaptionAndProgressBarDelegateMethod(string message, int val) // Cria método para o delegate declarado.
-        {
+        {            
             this.Text = message; // atualiza caption do Form
             if (!_mouseInProgressBar) labelStatus1.Text = message;
             progressBar1.Value = val; // atualiza barra de progresso
@@ -687,11 +713,11 @@ namespace analise_libvlc
         {
             if (MediaPlayerNotOK()) return;
 
-            var pos = _mp.Position; // obtém a posição da stream em percentual
-            var length = _mp.Length; // tamanho total da string em milisegundos 
-            var ctime = _mp.Time; // posição da stream em milisegundos
-            var _state = _mp.State;
-            var _rate = _mp.Rate;
+            var pos = _mediaplayer.Position; // obtém a posição da stream em percentual
+            var length = _mediaplayer.Length; // tamanho total da string em milisegundos 
+            var ctime = _mediaplayer.Time; // posição da stream em milisegundos
+            var _state = _mediaplayer.State;
+            var _rate = _mediaplayer.Rate;
 
             // converte para formato de hh:min:seg
             TimeSpan ts = TimeSpan.FromMilliseconds(ctime > 0 & ctime < length ? ctime : 0);
@@ -732,8 +758,8 @@ namespace analise_libvlc
         private void On_FormClosed(object sender, FormClosedEventArgs e)
         {
             _aTimer.Stop();
-            _mp.Stop();
-            _mp.Dispose();
+            _mediaplayer.Stop();
+            _mediaplayer.Dispose();
             _libVLC.Dispose();
         }
 
@@ -750,8 +776,15 @@ namespace analise_libvlc
         {
             // verifica se mouse está fora do richtext, para avançar ou retroceder com a roda do mouse
 
+            //if (e.Delta != 0)
+            //{
+            //    TimeSpan pos = TimeSpan.FromMilliseconds(_mediaplayer.Time) +
+            //                   TimeSpan.FromMilliseconds(_step * e.Delta / (Math.Abs(e.Delta)));
+            //    customSetPosTs(pos);
+            //}
+
             if (e.Delta != 0)
-                customSetPos(_mp.Time + _step * e.Delta / (Math.Abs(e.Delta)));
+                customSetPos(_mediaplayer.Time + _step * e.Delta / (Math.Abs(e.Delta)));
         }
 
         private void On_MouseMove(object sender, MouseEventArgs e)
@@ -806,7 +839,7 @@ namespace analise_libvlc
                     {
                         if (ModifierKeys == Keys.Control)
                         {
-                            _mp.SetRate(_mp.Rate - 0.1f);
+                            _mediaplayer.SetRate(_mediaplayer.Rate - 0.1f);
                         }
                         break;
                     }
@@ -814,15 +847,21 @@ namespace analise_libvlc
                     {
                         if (ModifierKeys == Keys.Control)
                         {
-                            _mp.SetRate(_mp.Rate + 0.1f);
+                            _mediaplayer.SetRate(_mediaplayer.Rate + 0.1f);
                         }
                         break;
                     }
                 case Keys.F1: // pausa/play com retorno
                     {
                         // se estiver reproduzindo, volta _step milissegundos e aguarda para reproduzir
-                        if (_mp.IsPlaying)
-                            customSetPos(_mp.Time - _step);
+                        if (_mediaplayer.IsPlaying)
+                        {
+                            //TimeSpan pos = TimeSpan.FromMilliseconds(_mediaplayer.Time) -
+                            //               TimeSpan.FromMilliseconds(_step);
+                            //customSetPosTs(pos);
+
+                            customSetPos(_mediaplayer.Time - _step);
+                        }
                         PlayPause(null, null);
 
                         break;
