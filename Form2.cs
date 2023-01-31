@@ -442,7 +442,7 @@ namespace analise_libvlc
 
         private bool MediaWithoutVideoStream()
         {
-            return _mediaplayer.VideoTrack < 0; // se não houver índice de stream de vídeo, retorna true
+            return _mediaplayer?.VideoTrack < 0; // se não houver índice de stream de vídeo, retorna true
         }
         private void extractToWav(string sourcefile) // experimental
         {
